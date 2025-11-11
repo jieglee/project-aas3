@@ -238,7 +238,7 @@ export default function LandingPage() {
 {/* ===== FITUR UNGGULAN ===== */}
 <section
   id="fitur"
-  className="w-full py-20 bg-gradient-to-b from-blue-100 to-white text-center"
+  className="w-full py-20 bg-linear-to-b from-blue-100 to-white text-center"
 >
   <h2 className="text-3xl font-bold mb-12">
     <span className="text-black">Fitur</span>{" "}
