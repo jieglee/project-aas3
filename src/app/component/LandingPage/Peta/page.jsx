@@ -1,4 +1,4 @@
-export default function Contact() {
+export default function Peta() {
   return (
     <section className="w-full py-20 bg-white px-6 md:px-20 flex flex-col md:flex-row items-center justify-center gap-12">
       <div className="w-full md:w-1/2 rounded-xl shadow-lg overflow-hidden">
