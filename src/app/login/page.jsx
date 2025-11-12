@@ -23,7 +23,7 @@ export default function Login() {
     }
 
     localStorage.setItem("loggedInUser", JSON.stringify(user));
-    router.push("/component/Home");
+    router.push("/User/Home");
   };
 
   return (

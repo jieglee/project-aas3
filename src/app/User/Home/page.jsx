@@ -1,162 +1,183 @@
 "use client";
+
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-  Home,
-  Layers,
-  Heart,
-  Bell,
-  BookOpen,
-  LogOut,
-  User,
-} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
-  const router = useRouter();
-  const [active, setActive] = useState("beranda");
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.push("/login");
-  };
-
-  const menu = [
-    { name: "beranda", label: "Beranda", icon: <Home size={20} /> },
-    { name: "kategori", label: "Kategori", icon: <Layers size={20} /> },
-    { name: "wishlist", label: "Wishlist", icon: <Heart size={20} /> },
-    { name: "notif", label: "Notifikasi", icon: <Bell size={20} /> },
-    { name: "riwayat", label: "Riwayat", icon: <BookOpen size={20} /> },
+  // ===== DATA =====
+  const recommended = [
+    {
+      title: "The Psychology of Money",
+      author: "Morgan Housel",
+      cover: "/psychology.png",
+    },
+    {
+      title: "How Innovation Works",
+      author: "Matt Ridley",
+      cover: "/innovation.png",
+    },
+    {
+      title: "Company of One",
+      author: "Paul Jarvis",
+      cover: "/company.png",
+    },
+    {
+      title: "Stupore E Tremori",
+      author: "Amelie Nothomb",
+      cover: "/stupore.png",
+    },
   ];
 
-  const stats = [
-    { title: "Total Buku", value: 210, color: "bg-blue-100 text-blue-700" },
-    { title: "Sedang Dipinjam", value: 5, color: "bg-yellow-100 text-yellow-700" },
-    { title: "Riwayat Peminjaman", value: 41, color: "bg-green-100 text-green-700" },
+  const categories = [
+    "All",
+    "Sci-Fi",
+    "Fantasy",
+    "Drama",
+    "Business",
+    "Education",
+    "Geography",
   ];
 
+  const books = [
+    {
+      title: "The Bees",
+      author: "Laline Paull",
+      cover: "/bees.png",
+      category: "Fantasy",
+    },
+    {
+      title: "Real Help",
+      author: "Ayodeji Awosika",
+      cover: "/realhelp.png",
+      category: "Business",
+    },
+    {
+      title: "The Fact of a Body",
+      author: "Alexandria Marzano",
+      cover: "/fact.png",
+      category: "Drama",
+    },
+    {
+      title: "The Room",
+      author: "Jonas Karlsson",
+      cover: "/room.png",
+      category: "Drama",
+    },
+    {
+      title: "Through the Breaking",
+      author: "Cate Emond",
+      cover: "/breaking.png",
+      category: "Sci-Fi",
+    },
+  ];
+
+  // ===== STATE =====
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const filteredBooks =
+    activeCategory === "All"
+      ? books
+      : books.filter((book) => book.category === activeCategory);
+
+  // ===== RENDER =====
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* ===== Sidebar ===== */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col justify-between fixed left-0 top-0 bottom-0">
-        <div>
-          <div className="flex flex-col items-center py-8 border-b">
-            <Image
-              src="/user.jpg"
-              alt="User"
-              width={70}
-              height={70}
-              className="rounded-full border-2 border-blue-400"
-            />
-            <h2 className="mt-3 text-lg font-semibold text-blue-800">
-              Pengguna
-            </h2>
-            <p className="text-sm text-gray-500">Siswa Perpustakaan</p>
-          </div>
-
-          <nav className="mt-6 space-y-1">
-            {menu.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => setActive(item.name)}
-                className={`flex items-center w-full px-6 py-3 text-sm font-medium transition-all ${
-                  active === item.name
-                    ? "bg-blue-100 text-blue-800 border-r-4 border-blue-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <span className="mr-3">{item.icon}</span>
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        <div className="px-6 py-4 border-t">
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full text-red-600 font-medium hover:bg-red-50 px-3 py-2 rounded-lg transition-all"
+    <div className="min-h-screen bg-gray-50 px-10 py-10">
+      {/* ===== SECTION: RECOMMENDED ===== */}
+      <section>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Recommended</h2>
+          <Link
+            href="#"
+            className="text-blue-600 font-medium hover:underline flex items-center gap-1"
           >
-            <LogOut size={18} className="mr-3" />
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* ===== Main Content ===== */}
-      <main className="ml-64 flex-1 p-8 space-y-10">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-blue-800 flex items-center gap-2">
-            <BookOpen className="text-blue-700" size={28} />
-            PusTBaka
-          </h1>
-          <User className="text-gray-600" size={24} />
+            See All →
+          </Link>
         </div>
 
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-8 rounded-2xl shadow-lg"
-        >
-          <h2 className="text-2xl font-bold mb-2">
-            Selamat Datang Kembali, Pengguna! 👋
-          </h2>
-          <p className="text-sm opacity-90">
-            Temukan buku favoritmu dan lanjutkan perjalanan bacamu hari ini.
-          </p>
-        </motion.div>
-
-        {/* Statistik */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {stats.map((item, i) => (
+        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+          {recommended.map((book, i) => (
             <motion.div
               key={i}
-              whileHover={{ scale: 1.05 }}
-              className={`p-6 rounded-xl shadow-md ${item.color}`}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+              className="min-w-[180px] bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col items-center"
             >
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="text-3xl font-bold mt-2">{item.value}</p>
+              <Image
+                src={book.cover}
+                alt={book.title}
+                width={120}
+                height={180}
+                className="rounded-md mb-3"
+              />
+              <h3 className="font-semibold text-gray-800 text-center">
+                {book.title}
+              </h3>
+              <p className="text-gray-500 text-sm text-center">
+                {book.author}
+              </p>
             </motion.div>
           ))}
         </div>
+      </section>
 
-        {/* Buku Section */}
-        <section>
-          <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-            📚 Buku Populer Minggu Ini
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "Laskar Pelangi", author: "Andrea Hirata", cover: "/laskar.png" },
-              { title: "Hujan", author: "Tere Liye", cover: "/hujan.png" },
-              { title: "Koala Kumal", author: "Raditya Dika", cover: "/koala.png" },
-            ].map((book, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ y: -5 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all"
-              >
+      {/* ===== SECTION: CATEGORIES ===== */}
+      <section className="mt-14">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Categories</h2>
+
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                activeCategory === cat
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-blue-100"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Book Cards */}
+        <div className="flex gap-6 flex-wrap justify-center">
+          {filteredBooks.map((book, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-4 flex flex-col items-center w-[180px]"
+            >
+              <div className="relative">
                 <Image
                   src={book.cover}
                   alt={book.title}
-                  width={300}
-                  height={400}
-                  className="w-full h-56 object-cover"
+                  width={130}
+                  height={190}
+                  className="rounded-md mb-3"
                 />
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-800">{book.title}</h3>
-                  <p className="text-gray-500 text-sm">{book.author}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      </main>
+                {/* Example Rating Badge */}
+                {book.title === "The Fact of a Body" && (
+                  <span className="absolute top-2 right-2 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    ★ 4.8
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-semibold text-gray-800 text-center">
+                {book.title}
+              </h3>
+              <p className="text-gray-500 text-sm text-center">
+                {book.author}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
