@@ -40,7 +40,7 @@ export default function Koleksi() {
 
             <Link
               href="/login"
-              className="bg-[#1E3A8A] text-white text-sm px-6 py-2 rounded-full hover:bg-blue-800 transition-transform transform hover:scale-105"
+              className="bg-[#1E3A8A] text-white text-sm px-6 py-2 rounded-lg hover:bg-blue-800 transition-transform transform hover:scale-105"
             >
               Pinjam
             </Link>

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link"; // ini juga wajib ditambahkan, kamu lupa import Link!
+import Link from "next/link"; 
 
 export default function Hero() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -14,56 +14,38 @@ export default function Hero() {
 
   return (
     <>
-      {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center text-white w-full">
-        {/* Background image */}
-        <div className="absolute inset-0 overflow-hidden rounded-b-[60px]">
+
+        {/* GAMBAR BUAT BAGAIAN HERO */}
+        <div className="absolute inset-0 overflow-hidden">
           <Image
-            src="/FotoTB1.png"
-            alt="Gedung TB"
-            fill
-            className="object-cover brightness-50"
-            priority
-          />
+            src="/FotoTB1.png" alt="Gedung TB"fill className="object-cover brightness-50" priority/>
         </div>
 
-        {/* Navbar */}
+        {/* NAVBAR */}
         <nav
-          className={`fixed top-5 left-1/2 transform -translate-x-1/2 z-50
-          flex items-center justify-between w-[60%] max-w-5xl
-          backdrop-blur-md bg-white/70 rounded-full px-8 py-3 shadow-md transition-all duration-500
-          ${isScrolled ? "bg-white/90" : "bg-white/70"}`}
-        >
+          className={`fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-between w-[60%] max-w-5xl backdrop-blur-md bg-white/70 rounded-full px-8 py-3 shadow-md transition-all duration-500
+          ${isScrolled ? "bg-white/90" : "bg-white/70"}`}>
           <h1 className="text-lg font-bold text-[#1E3A8A]">PusTBaka</h1>
           <ul className="flex space-x-8 text-gray-800 font-medium">
-            <li
-              className="hover:text-blue-700 cursor-pointer"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            >
+
+            <li className="hover:text-blue-700 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               Beranda
             </li>
-            <li
-              className="hover:text-blue-700 cursor-pointer"
-              onClick={() =>
-                document.getElementById("tentang")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+
+            <li className="hover:text-blue-700 cursor-pointer" onClick={() => document.getElementById("tentang")?.scrollIntoView({ behavior: "smooth" })
+          }>
               Tentang
             </li>
-            <li
-              className="hover:text-blue-700 cursor-pointer"
-              onClick={() =>
-                document.getElementById("koleksi")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Koleksi
+
+            <li className="hover:text-blue-700 cursor-pointer" onClick={() => document.getElementById("koleksi")?.scrollIntoView({ behavior: "smooth" })
+          }>
+            Koleksi
             </li>
-            <li
-              className="hover:text-blue-700 cursor-pointer"
-              onClick={() =>
+
+            <li className="hover:text-blue-700 cursor-pointer" onClick={() =>
                 document.getElementById("fitur")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
+              }>
               Fitur
             </li>
           </ul>

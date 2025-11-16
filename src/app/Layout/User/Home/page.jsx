@@ -6,24 +6,27 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
-  // ===== DATA =====
   const recommended = [
     {
+      id: 1,
       title: "The Psychology of Money",
       author: "Morgan Housel",
       cover: "/psychology.png",
     },
     {
+      id: 2,
       title: "How Innovation Works",
       author: "Matt Ridley",
       cover: "/innovation.png",
     },
     {
+      id: 3,
       title: "Company of One",
       author: "Paul Jarvis",
       cover: "/company.png",
     },
     {
+      id: 4,
       title: "Stupore E Tremori",
       author: "Amelie Nothomb",
       cover: "/stupore.png",
@@ -32,48 +35,67 @@ export default function HomePage() {
 
   const categories = [
     "All",
-    "Sci-Fi",
-    "Fantasy",
-    "Drama",
+    "Fantasi",
+    "PKL",
+    "Horor",
     "Business",
     "Education",
-    "Geography",
+    "Bahasa",
+    "Pelajaran",
   ];
 
   const books = [
     {
+      id: 5,
       title: "The Bees",
       author: "Laline Paull",
       cover: "/bees.png",
-      category: "Fantasy",
+      category: "Fantasi",
     },
     {
+      id: 6,
       title: "Real Help",
       author: "Ayodeji Awosika",
       cover: "/realhelp.png",
       category: "Business",
     },
     {
+      id: 7,
       title: "The Fact of a Body",
       author: "Alexandria Marzano",
       cover: "/fact.png",
-      category: "Drama",
+      category: "Horor",
     },
     {
+      id: 8,
       title: "The Room",
       author: "Jonas Karlsson",
       cover: "/room.png",
-      category: "Drama",
+      category: "PKL",
     },
     {
+      id: 9,
       title: "Through the Breaking",
       author: "Cate Emond",
       cover: "/breaking.png",
-      category: "Sci-Fi",
+      category: "Education",
+    },
+    {
+      id: 10,
+      title: "Learn Bahasa",
+      author: "John Doe",
+      cover: "/bahasa.png",
+      category: "Bahasa",
+    },
+    {
+      id: 11,
+      title: "Matematika Dasar",
+      author: "Jane Doe",
+      cover: "/pelajaran.png",
+      category: "Pelajaran",
     },
   ];
 
-  // ===== STATE =====
   const [activeCategory, setActiveCategory] = useState("All");
 
   const filteredBooks =
@@ -81,15 +103,14 @@ export default function HomePage() {
       ? books
       : books.filter((book) => book.category === activeCategory);
 
-  // ===== RENDER =====
   return (
     <div className="min-h-screen bg-gray-50 px-10 py-10">
-      {/* ===== SECTION: RECOMMENDED ===== */}
+      {/* ===== RECOMMENDED ===== */}
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Recommended</h2>
           <Link
-            href="#"
+            href="/Layout/User/BookPage"
             className="text-blue-600 font-medium hover:underline flex items-center gap-1"
           >
             See All →
@@ -97,36 +118,46 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-          {recommended.map((book, i) => (
+          {recommended.map((book) => (
             <motion.div
-              key={i}
-              whileHover={{ y: -5 }}
+              key={book.id}
+              whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
-              className="min-w-[180px] bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col items-center"
+              className="min-w-[200px] bg-white rounded-2xl shadow-md hover:shadow-lg transition flex flex-col"
             >
-              <Image
-                src={book.cover}
-                alt={book.title}
-                width={120}
-                height={180}
-                className="rounded-md mb-3"
-              />
-              <h3 className="font-semibold text-gray-800 text-center">
-                {book.title}
-              </h3>
-              <p className="text-gray-500 text-sm text-center">
-                {book.author}
-              </p>
+              <div className="relative w-full h-56 overflow-hidden rounded-t-2xl">
+                <Image
+                  src={book.cover}
+                  alt={book.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="p-4 flex flex-col justify-between flex-grow">
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
+                    {book.title}
+                  </h3>
+                  <p className="text-gray-500 text-xs mt-1">{book.author}</p>
+                </div>
+
+                <Link
+                  href={`/Layout/User/Detail/${book.id}`}
+                  className="mt-3 text-center text-sm bg-[#1E3A8A] text-white py-1.5 rounded-lg hover:bg-[#0E2565] transition"
+                >
+                  Lihat Detail
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ===== SECTION: CATEGORIES ===== */}
+      {/* ===== CATEGORIES ===== */}
       <section className="mt-14">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Categories</h2>
 
-        {/* Filter Buttons */}
         <div className="flex flex-wrap gap-3 mb-8">
           {categories.map((cat) => (
             <button
@@ -143,37 +174,38 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Book Cards */}
-        <div className="flex gap-6 flex-wrap justify-center">
-          {filteredBooks.map((book, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {filteredBooks.map((book) => (
             <motion.div
-              key={i}
-              whileHover={{ scale: 1.05 }}
+              key={book.id}
+              whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-4 flex flex-col items-center w-[180px]"
+              className="bg-white rounded-2xl shadow-md hover:shadow-lg transition flex flex-col"
             >
-              <div className="relative">
+              <div className="relative w-full h-56 overflow-hidden rounded-t-2xl">
                 <Image
                   src={book.cover}
                   alt={book.title}
-                  width={130}
-                  height={190}
-                  className="rounded-md mb-3"
+                  fill
+                  className="object-cover"
                 />
-                {/* Example Rating Badge */}
-                {book.title === "The Fact of a Body" && (
-                  <span className="absolute top-2 right-2 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    ★ 4.8
-                  </span>
-                )}
               </div>
 
-              <h3 className="font-semibold text-gray-800 text-center">
-                {book.title}
-              </h3>
-              <p className="text-gray-500 text-sm text-center">
-                {book.author}
-              </p>
+              <div className="p-4 flex flex-col justify-between flex-grow">
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
+                    {book.title}
+                  </h3>
+                  <p className="text-gray-500 text-xs mt-1">{book.author}</p>
+                </div>
+
+                <Link
+                  href={`/Layout/User/Detail/${book.id}`}
+                  className="mt-3 text-center text-sm bg-[#1E3A8A] text-white py-1.5 rounded-lg hover:bg-[#0E2565] transition"
+                >
+                  Lihat Detail
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>

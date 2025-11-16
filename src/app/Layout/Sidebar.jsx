@@ -1,83 +1,62 @@
 "use client";
-import { useSidebar } from "../contexts/SidebarContextUser";
-import { Home, Heart, BookOpen, User } from "lucide-react";
+import { Home, Heart, History, User, FileWarning } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-export default function Sidebar() {
-  const { isOpen, closeSidebar } = useSidebar();
+export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
 
   const menus = [
-    { name: "Beranda", icon: <Home size={20} />, path: "/user/home" },
-    { name: "Wishlist", icon: <Heart size={20} />, path: "/wishlist" },
-    { name: "Peminjaman", icon: <BookOpen size={20} />, path: "/peminjaman" },
-    { name: "Profil", icon: <User size={20} />, path: "/profile" },
+    { name: "Beranda", icon: <Home size={20} />, path: "/Layout/User/Home" },
+    { name: "Wishlist", icon: <Heart size={20} />, path: "/Layout/User/Whislist" },
+    { name: "Riwayat", icon: <History size={20} />, path: "/Layout/User/Riwayat" },
+    { name: "Profil", icon: <User size={20} />, path: "/Layout/User/Profile" },
+
+    // ➕ Menu Baru: Laporan
+    { name: "Laporan", icon: <FileWarning size={20} />, path: "/Layout/User/Laporan" },
   ];
 
   return (
-    <>
-      {/* Backdrop untuk mobile */}
-      {isOpen && (
-        <div
-          onClick={closeSidebar}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-        ></div>
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full bg-white shadow-lg border-r z-50 transition-all duration-300
-        ${isOpen ? "w-64" : "w-20"} 
-        `}
+    <aside
+      className={`fixed top-0 left-0 h-screen bg-white border-r border-blue-200 shadow-sm flex flex-col z-40 transition-all duration-300 ${
+        isOpen ? "w-64" : "w-20"
+      }`}
+    >
+      {/* Header logo */}
+      <div
+        className={`flex items-center ${
+          isOpen ? "justify-start px-6" : "justify-center"
+        } py-5`}
       >
-        {/* Logo */}
-        <div
-          className={`p-6 border-b flex items-center justify-center ${
-            isOpen ? "justify-start px-6" : "px-0"
-          }`}
-        >
-          <h2
-            className={`text-xl font-bold text-blue-700 transition-all duration-300 overflow-hidden ${
-              isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-5"
-            }`}
-          >
-            📚 PusTBaka
-          </h2>
-          {!isOpen && (
-            <span className="text-2xl text-blue-700">📚</span>
-          )}
-        </div>
+        <Image src="/logo-2.png" alt="Logo" width={32} height={32} />
+        {isOpen && (
+          <h1 className="text-lg font-bold text-[#1E3A8A] ml-3">PusTBaka</h1>
+        )}
+      </div>
 
-        {/* Menu Navigasi */}
-        <nav className="flex flex-col gap-2 p-4">
-          {menus.map((menu, i) => {
-            const isActive = pathname === menu.path;
-            return (
-              <Link
-                key={i}
-                href={menu.path}
-                onClick={closeSidebar}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all
-                ${
-                  isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 hover:bg-blue-50"
-                } ${!isOpen ? "justify-center" : ""}`}
-              >
-                {menu.icon}
-                <span
-                  className={`transition-all duration-300 ${
-                    isOpen ? "opacity-100 w-auto" : "opacity-0 w-0 overflow-hidden"
-                  }`}
-                >
-                  {menu.name}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
-    </>
+      {/* Menu */}
+      <nav className="flex-1 mt-4">
+        {menus.map((menu, index) => {
+          const isActive = pathname === menu.path;
+          return (
+            <Link
+              key={index}
+              href={menu.path}
+              className={`flex items-center ${
+                isOpen ? "justify-start px-4" : "justify-center"
+              } gap-3 rounded-lg py-2 mb-1 transition font-medium ${
+                isActive
+                  ? "bg-[#1E3A8A] text-white shadow-sm"
+                  : "text-[#1E3A8A] hover:bg-blue-100"
+              }`}
+            >
+              {menu.icon}
+              {isOpen && <span className="text-sm">{menu.name}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
   );
 }

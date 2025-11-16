@@ -8,37 +8,78 @@ export default function SplashScreen({ isVisible, onExitComplete }) {
       {isVisible && (
         <motion.div
           key="splash"
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#1E3A8A]"
-          initial={{ y: 0, opacity: 1, borderBottomLeftRadius: "0%", borderBottomRightRadius: "0%" }}
-          animate={{ y: 0, opacity: 1 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center 
+            bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900"
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           exit={{
             y: "-100%",
-            borderBottomLeftRadius: "50%",
-            borderBottomRightRadius: "50%",
-            opacity: 1,
+            borderBottomLeftRadius: "60%",
+            borderBottomRightRadius: "60%",
+            filter: "blur(10px)",
             transition: {
-              duration: 1.3,
+              duration: 1.4,
               ease: [0.45, 0, 0.55, 1],
             },
           }}
           style={{ overflow: "hidden" }}
         >
+          {/* Background Glow */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{
+              background:
+                "radial-gradient(circle at center, rgba(255,255,255,0.25), transparent 70%)",
+            }}
+          />
+
           {/* Logo + Text */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex items-center space-x-3"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className="flex items-center space-x-4 relative"
           >
-            <Image
-              src="/logo.png"
-              alt="Logo PusTBaka"
-              width={65}
-              height={65}
-              priority
-              className="object-contain drop-shadow-lg"
-            />
-            <h1 className="text-3xl font-bold text-white">PusTBaka</h1>
+            {/* Logo with subtle pulse */}
+            <motion.div
+              animate={{ scale: [1, 1.07, 1] }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <Image
+                src="/logo.png"
+                alt="Logo PusTBaka"
+                width={70}
+                height={70}
+                priority
+                className="object-contain drop-shadow-2xl"
+              />
+            </motion.div>
+
+            {/* Smooth Fade Text */}
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                delay: 0.2,
+                duration: 0.7,
+                ease: "easeOut",
+              }}
+              className="text-4xl font-extrabold tracking-wide text-white drop-shadow-lg"
+            >
+              PusTBaka
+            </motion.h1>
           </motion.div>
         </motion.div>
       )}
