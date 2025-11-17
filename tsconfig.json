@@ -30,7 +30,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/user/page.jsx", "src/app/user/layout.jsx"  ],
   "exclude": [
     "node_modules"
   ]

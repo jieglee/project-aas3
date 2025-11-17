@@ -27,8 +27,8 @@ export default function Login() {
 
         localStorage.setItem("loggedInUser", JSON.stringify(user));
 
-        // 👉 Redirect ke EXACT path yg kamu kirim
-        router.push("/Layout/User/Home");
+
+        router.push("/component/user/Home");
     };
 
     return (

@@ -57,18 +57,18 @@ export default function ProfileDropdown() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.25 }}
-                        className="absolute right-0 mt-3 w-56 bg-white border border-green-500 rounded-md shadow-lg p-4 z-40"
+                        className="absolute right-0 mt-3 w-56 bg-white border border-blue-500 rounded-md shadow-lg p-4 z-40"
                     >
                         <div className="mb-3">
-                            <p className="font-semibold text-green-800 text-sm">
+                            <p className="font-semibold text-blue-800 text-sm">
                                 jiegle jeffrey
                             </p>
-                            <p className="text-sm text-green-600">
+                            <p className="text-sm text-blue-600">
                                 kalsahalkautsar@gmail.com
                             </p>
                         </div>
                         <button
-                            className="flex items-center gap-2 text-green-700 hover:text-green-900 transition text-sm font-medium"
+                            className="flex items-center gap-2 text-blue-700 hover:text-blue-900 transition text-sm font-medium"
                             onClick={() => alert("Sign out clicked")}
                         >
                             <LogOut size={16} />

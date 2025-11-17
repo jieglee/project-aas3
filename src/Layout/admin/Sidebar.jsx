@@ -13,7 +13,6 @@ export default function Sidebar({ isOpen }) {
     { name: "Riwayat", icon: <History size={20} />, path: "/Layout/User/Riwayat" },
     { name: "Profil", icon: <User size={20} />, path: "/Layout/User/Profile" },
 
-    // ➕ Menu Baru: Laporan
     { name: "Laporan", icon: <FileWarning size={20} />, path: "/Layout/User/Laporan" },
   ];
 

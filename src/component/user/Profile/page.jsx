@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import Modal from "../../../component/modal/modal";
+import Modal from "../../modal/modal";
 
 export default function Profil() {
   const [isModalOpen, setIsModalOpen] = useState(false);
