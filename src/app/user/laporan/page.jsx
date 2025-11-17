@@ -2,12 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import FormLaporan from "../../../../components/user/Laporan/FormLaporan";
-import InputSelect from "../../../component/user/Laporan/InputSelect";
-import InputText from "../../../component/user/Laporan/InputText";
-import InputTextarea from "../../../component/user/Laporan/InputTextarea";
+import FormLaporan from "../../../component/user/Laporan/FormLaporan";
 import SuccessToast from "../../../component/user/Laporan/SuccessToast";
-import UploadFoto from "../../../component/user/Laporan/UploadFoto";
+
 
 export default function LaporanPage() {
     const router = useRouter();

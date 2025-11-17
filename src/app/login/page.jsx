@@ -9,33 +9,39 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
 
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
+        try {
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
 
-        const user = users.find(
-            (u) =>
-                u?.email?.toLowerCase() === email.toLowerCase() &&
-                u?.password === password
-        );
+            const data = await res.json();
 
-        if (!user) {
-            setError("Email atau password salah!");
-            return;
+            if (!res.ok) {
+                setError(data.message);
+                return;
+            }
+
+            // simpan user di localStorage
+            localStorage.setItem("loggedInUser", JSON.stringify(data.user));
+
+            // arahkan ke halaman home
+            router.push("/user/home");
+        } catch (err) {
+            console.error(err);
+            setError("Terjadi kesalahan, coba lagi!");
         }
-
-        localStorage.setItem("loggedInUser", JSON.stringify(user));
-
-
-        router.push("/component/user/Home");
     };
 
     return (
         <div className="bg-gray-100 lg:h-screen flex items-center justify-center p-4">
             <div className="max-w-6xl bg-white shadow-lg p-6 lg:p-8 rounded-2xl">
                 <div className="grid md:grid-cols-2 items-center gap-y-8">
-
                     <div className="w-full h-full">
                         <div className="aspect-square bg-gray-50 relative before:absolute before:inset-0 before:bg-indigo-600/70 rounded-md overflow-hidden w-full h-full">
                             <img
@@ -106,7 +112,6 @@ export default function Login() {
                             </a>
                         </p>
                     </form>
-
                 </div>
             </div>
         </div>

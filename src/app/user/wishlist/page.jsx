@@ -1,31 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import WishlistList from "../../../component/user/Whislist/List";
 import EmptyWishlist from "../../../component/user/Whislist/EmptyList";
 
 export default function WishlistPage() {
-    const [wishlist, setWishlist] = useState([
-        {
-            title: "The Psychology of Money",
-            author: "Morgan Housel",
-            cover: "/psychology.png",
-        },
-        {
-            title: "The Bees",
-            author: "Laline Paull",
-            cover: "/bees.png",
-        },
-        {
-            title: "Real Help",
-            author: "Ayodeji Awosika",
-            cover: "/realhelp.png",
-        },
-    ]);
+    const [wishlist, setWishlist] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const removeBook = (title) => {
-        setWishlist((prev) => prev.filter((book) => book.title !== title));
+    useEffect(() => {
+        async function fetchWishlist() {
+            try {
+                const res = await fetch("/api/wishlist");
+                const data = await res.json();
+                setWishlist(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchWishlist();
+    }, []);
+
+    const removeBook = async (id) => {
+        // opsional: DELETE ke API jika ada tabel wishlist
+        setWishlist((prev) => prev.filter((book) => book.id !== id));
     };
+
+    if (loading) return <p className="text-center mt-20">Loading...</p>;
 
     return (
         <div className="min-h-screen bg-gray-50 px-8 py-10">
