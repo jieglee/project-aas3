@@ -1,17 +1,17 @@
-
-import { db } from "../../../lib/db"; // pastikan path ini sesuai
+import { db } from "../../../lib/db";
 
 export async function GET() {
-  try {
-    const [rows] = await db.query("SELECT * FROM buku"); // misal wishlist sementara ambil semua buku
-    return new Response(JSON.stringify(rows), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ message: "Gagal mengambil wishlist" }), {
-      status: 500,
-    });
-  }
+    try {
+        const [rows] = await db.query("SELECT * FROM wishlist");
+        return new Response(JSON.stringify(rows), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
+    } catch (err) {
+        console.error(err);
+        return new Response(
+            JSON.stringify({ message: "Gagal mengambil wishlist" }),
+            { status: 500 }
+        );
+    }
 }

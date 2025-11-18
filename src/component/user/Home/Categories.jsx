@@ -2,7 +2,6 @@
 import React from "react";
 
 export default function Categories({ categories, activeCategory, setActiveCategory, loading }) {
-  // Jika categories undefined atau null, set default array kosong
   const safeCategories = categories || [];
 
   return (

@@ -28,7 +28,8 @@ export default function Login() {
             }
 
             // simpan user di localStorage
-            localStorage.setItem("loggedInUser", JSON.stringify(data.user));
+  localStorage.setItem("userId", data.user.id);
+
 
             // arahkan ke halaman home
             router.push("/user/home");

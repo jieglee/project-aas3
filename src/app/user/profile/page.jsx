@@ -7,7 +7,6 @@ import ProfileModal from "../../../component/user/Profile/ProfileModal";
 
 export default function ProfilPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const [profile, setProfile] = useState({
         nama: "Guest",
         kelas: "Belum diatur",
@@ -27,13 +26,11 @@ export default function ProfilPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white px-6 md:px-20 py-10">
-            <div className="border border-[#0E2565] rounded-2xl p-6">
-
-                <h2 className="text-2xl font-semibold text-[#0E2565] mb-6">Profile</h2>
+        <div className="min-h-screen bg-gray-50 px-6 md:px-20 py-10">
+            <div className="max-w-4xl mx-auto">
+                <h2 className="text-3xl font-bold text-[#0E2565] mb-8">Profile Saya</h2>
 
                 <ProfileCard profile={profile} onEdit={() => setIsModalOpen(true)} />
-
                 <InfoPribadi profile={profile} />
 
                 <ProfileModal
