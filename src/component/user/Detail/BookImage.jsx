@@ -3,7 +3,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function BookImage({ cover, title }) {
-    const imgSrc = cover || "/default-cover.png"; 
+    const imgSrc = cover 
+        ? `/buku/${cover}`   // 🔥 Ambil gambar dari folder public/buku
+        : "/default-cover.png";
 
     return (
         <motion.div

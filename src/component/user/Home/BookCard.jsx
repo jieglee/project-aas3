@@ -4,13 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function BookCard({ book }) {
+    const imgSrc = book.img
+        ? `/buku/${book.img}`   // 🔥 otomatis ambil gambar dari public/buku
+        : "/placeholder.png";   // fallback
+
     return (
         <Link href={`/user/detail/${book.id}`}>
             <div className="bg-white rounded-2xl shadow-md hover:shadow-lg flex flex-col cursor-pointer">
                 {/* Cover */}
                 <div className="relative w-full h-56 overflow-hidden rounded-t-2xl">
                     <Image
-                        src={book.img || "/placeholder.png"}
+                        src={imgSrc}
                         alt={book.judul}
                         fill
                         className="object-cover"
