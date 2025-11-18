@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
@@ -16,6 +17,7 @@ export default function Detail() {
         async function fetchBook() {
             try {
                 const res = await fetch(`/api/buku/${id}`);
+                if (!res.ok) throw new Error("Buku tidak ditemukan");
                 const data = await res.json();
                 setBook(data);
             } catch (err) {

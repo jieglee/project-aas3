@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
-import ProfileDropdown from "./ProfileDropdown";
-import NotificationPopup from "./NotificationPopup";
+import ProfileDropdown from "./ProfileDropdownAdmin";
+import NotificationPopup from "./NotificationPopupAdmin";
 
-export default function Topbar({ toggleSidebar, isOpen }) {
+export default function TopbarAdmin({ toggleSidebar, isOpen }) {
   const [showNotif, setShowNotif] = useState(false);
   const [book, setBook] = useState(null);
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function NotificationPopup({ isOpen, onClose, book }) {
+export default function NotificationPopupAdmin({ isOpen, onClose, book }) {
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {

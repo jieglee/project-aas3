@@ -4,16 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-export default function Sidebar({ isOpen }) {
+export default function SidebarAdmin({ isOpen }) {
   const pathname = usePathname();
 
   const menus = [
-    { name: "Beranda", icon: <Home size={20} />, path: "/Layout/User/Home" },
-    { name: "Wishlist", icon: <Heart size={20} />, path: "/Layout/User/Whislist" },
-    { name: "Riwayat", icon: <History size={20} />, path: "/Layout/User/Riwayat" },
-    { name: "Profil", icon: <User size={20} />, path: "/Layout/User/Profile" },
+    { name: "Beranda", icon: <Home size={20} />, path: "/Admin" },
+    { name: "Manajemen Buku", icon: <Heart size={20} />, path: "/Admin/Book" },
+    { name: "Manajemen Pengguna", icon: <History size={20} />, path: "/Admin/UserSetting" },
+    { name: "Peminjaman", icon: <User size={20} />, path: "/Admin/Peminjaman" },
 
-    { name: "Laporan", icon: <FileWarning size={20} />, path: "/Layout/User/Laporan" },
+    { name: "Laporan", icon: <FileWarning size={20} />, path: "/Admin/Reports" },
   ];
 
   return (

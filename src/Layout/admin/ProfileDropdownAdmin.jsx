@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { LogOut, ChevronDown } from "lucide-react";
 
-export default function ProfileDropdown() {
+export default function ProfileDropdownAdmin() {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef(null);
 

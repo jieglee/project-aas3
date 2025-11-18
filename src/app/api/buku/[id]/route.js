@@ -4,7 +4,9 @@ export async function GET(req, { params }) {
     const { id } = params;
     try {
         const [rows] = await db.query("SELECT * FROM buku WHERE id = ?", [id]);
-        if (rows.length === 0) return new Response(JSON.stringify({ message: "Buku tidak ditemukan" }), { status: 404 });
+        if (!rows.length)
+            return new Response(JSON.stringify({ message: "Buku tidak ditemukan" }), { status: 404 });
+
         return new Response(JSON.stringify(rows[0]), {
             status: 200,
             headers: { "Content-Type": "application/json" },
