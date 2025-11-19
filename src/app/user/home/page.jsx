@@ -55,7 +55,7 @@ export default function HomePage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredBooks.map((book) => (
-                        // LINK HANYA DI SINI
+
                         <Link key={book.id} href={`/user/detail/${book.id}`}>
                             <BookCard book={book} />
                         </Link>

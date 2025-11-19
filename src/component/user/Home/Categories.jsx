@@ -16,7 +16,7 @@ export default function Categories({ categories, activeCategory, setActiveCatego
             key={cat}
             onClick={() => setActiveCategory(cat)}
             className={`px-4 py-2 rounded-xl ${
-              activeCategory === cat ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-700"
+              activeCategory === cat ? "bg-blue-900 text-white" : "bg-gray-200 text-gray-700"
             }`}
           >
             {cat}

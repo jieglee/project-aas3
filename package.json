@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@shadcn/ui": "^0.0.4",
     "apexcharts": "^5.3.6",
     "bcryptjs": "^3.0.3",
