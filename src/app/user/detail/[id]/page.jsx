@@ -3,34 +3,80 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+import { FaHeart } from "react-icons/fa";
 
 export default function DetailPage() {
-    const { id } = useParams(); // ✅ INI YANG BENAR UNTUK CLIENT COMPONENT
+    const { id } = useParams();
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
+    const [isWishlisted, setIsWishlisted] = useState(false);
 
+    const user_id = 1; // TODO: ganti sesuai user login
+
+    // Ambil detail buku
     useEffect(() => {
         async function fetchBook() {
             try {
                 const res = await fetch(`/api/buku/${id}`);
-
-                if (!res.ok) {
-                    setBook(null);
-                    return;
-                }
-
+                if (!res.ok) return setBook(null);
                 const data = await res.json();
                 setBook(data);
             } catch (err) {
-                console.error("Error fetching:", err);
+                console.error(err);
             } finally {
                 setLoading(false);
             }
         }
 
-        if (id) fetchBook(); // ⛔ jangan fetch sebelum id ada
+        async function checkWishlist() {
+            try {
+                const res = await fetch("/api/wishlist");
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    const exists = data.some(
+                        (item) => item.buku_id === Number(id) && item.user_id === user_id
+                    );
+                    setIsWishlisted(exists);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        if (id) {
+            fetchBook();
+            checkWishlist();
+        }
     }, [id]);
+
+    // Tambah ke wishlist
+    async function addWishlist() {
+        if (wishlistLoading) return;
+
+        setWishlistLoading(true);
+        try {
+            const res = await fetch("/api/wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ buku_id: Number(id), user_id }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success(`${book.judul} berhasil ditambahkan ke wishlist`);
+                setIsWishlisted(true);
+            } else {
+                toast.error("Gagal menambahkan wishlist");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Terjadi kesalahan server");
+        } finally {
+            setWishlistLoading(false);
+        }
+    }
 
     if (loading) {
         return (
@@ -44,13 +90,7 @@ export default function DetailPage() {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-gray-600 p-4">
                 <h2 className="text-xl font-bold mb-4">Buku Tidak Ditemukan</h2>
-                <p className="text-center mb-4">
-                    Buku dengan ID <strong>{id}</strong> tidak ditemukan.
-                </p>
-                <Link 
-                    href="/user/home"
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg"
-                >
+                <Link href="/user/home" className="bg-blue-600 text-white px-6 py-2 rounded-lg">
                     Kembali ke Home
                 </Link>
             </div>
@@ -59,9 +99,9 @@ export default function DetailPage() {
 
     return (
         <>
-            <Toaster />
+            <Toaster position="top-right" />
             <div className="p-6 md:p-10 max-w-5xl mx-auto">
-                <button 
+                <button
                     onClick={() => window.history.back()}
                     className="text-blue-600 hover:text-blue-800 mb-6 flex items-center gap-2 text-sm font-medium"
                 >
@@ -69,14 +109,16 @@ export default function DetailPage() {
                 </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-lg rounded-2xl p-6 border border-gray-100">
+                    {/* Gambar Buku */}
                     <div className="flex justify-center items-center">
-                        <img 
+                        <img
                             src={book.img ? `/buku/${book.img}` : "/placeholder.png"}
                             alt={book.judul}
                             className="rounded-xl shadow-md max-w-[300px] w-full"
                         />
                     </div>
 
+                    {/* Detail Buku */}
                     <div>
                         <div className="space-y-3">
                             <h1 className="text-2xl font-bold text-gray-800">{book.judul}</h1>
@@ -84,6 +126,7 @@ export default function DetailPage() {
                                 <span className="font-semibold">Penulis:</span> {book.penulis}
                             </p>
                             <p className="text-gray-700 text-sm leading-relaxed">{book.deskripsi}</p>
+
                             <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
                                 <p><span className="font-semibold">Penerbit:</span> {book.penerbit}</p>
                                 <p><span className="font-semibold">Tahun Terbit:</span> {book.tahun_terbit}</p>
@@ -92,19 +135,24 @@ export default function DetailPage() {
                             </div>
                         </div>
 
+                        {/* Tombol */}
                         <div className="flex gap-3 mt-6">
-                            <button
-                                onClick={() => window.location.href = `/Layout/User/Borrow?id=${id}`}
+                            <Link
+                                href={`/Layout/User/Borrow?id=${id}`}
                                 className="bg-blue-900 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 shadow-sm"
                             >
                                 Pinjam
-                            </button>
+                            </Link>
 
                             <button
-                                onClick={() => alert(`${book.judul} ditambahkan ke wishlist ❤️`)}
-                                className="border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm flex items-center gap-2 shadow-sm"
+                                onClick={addWishlist}
+                                disabled={isWishlisted || wishlistLoading}
+                                className={`group border px-4 py-2 rounded-lg text-sm flex items-center gap-2 shadow-sm
+                                    ${isWishlisted ? 'border-gray-400 text-gray-400 cursor-not-allowed' : 'border-red-300 text-red-500 hover:border-red-600 hover:text-red-700'}
+                                `}
                             >
-                                ❤️ Wishlist
+                                <FaHeart className={`text-base transition-all ${isWishlisted ? 'text-gray-400' : 'text-red-400 group-hover:text-red-600'}`} />
+                                {isWishlisted ? "Sudah di Wishlist" : "Wishlist"}
                             </button>
                         </div>
                     </div>

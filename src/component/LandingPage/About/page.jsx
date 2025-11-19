@@ -14,11 +14,11 @@ export default function Tentang() {
             <div className="flex flex-col md:flex-row items-center justify-center gap-10">
               <div className="w-full md:w-1/2 flex justify-center">
                 <Image
-                  src="/tentang.png"
+                  src="/Learning-rafiki.png"
                   alt="Ilustrasi PusTBaka"
                   width={400}
                   height={300}
-                  className="rounded-lg"
+                  className="rounded-lg "
                 />
               </div>
     

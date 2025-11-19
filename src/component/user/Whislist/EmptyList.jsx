@@ -1,3 +1,5 @@
+"use client";
+
 export default function EmptyWishlist() {
     return (
         <p className="text-gray-500 text-center mt-20">
