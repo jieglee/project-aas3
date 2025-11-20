@@ -1,5 +1,5 @@
 "use client";
-import { Home, Book, Users, ClipboardList, FileText } from "lucide-react";
+import { Home, Users, Book, ClipboardList, FileText } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -8,9 +8,9 @@ export default function SidebarAdmin({ isOpen }) {
   const pathname = usePathname();
 
   const menus = [
-    { name: "Beranda", icon: <Home size={20} />, path: "/Admin" },
-    { name: "Manajemen Buku", icon: <Book size={20} />, path: "/Admin/DaftarBuku" },
-    { name: "Manajemen Pengguna", icon: <Users size={20} />, path: "/Admin/UserSetting" },
+    { name: "Dashboard", icon: <Home size={20} />, path: "/Admin" },
+    { name: "Kelola Users", icon: <Users size={20} />, path: "/Admin/KelolaUser" },
+    { name: "Kelola Buku", icon: <Book size={20} />, path: "/Admin/DaftarBuku" },
     { name: "Peminjaman", icon: <ClipboardList size={20} />, path: "/Admin/Peminjaman" },
     { name: "Laporan", icon: <FileText size={20} />, path: "/Admin/Reports" },
   ];
