@@ -1,6 +1,7 @@
 "use client";
 
 export default function BookInfo({ book }) {
+if (!book) return <p>Loading...</p>;
     return (
         <>
             <h1 className="text-2xl font-bold text-gray-800">{book.judul}</h1>
