@@ -34,7 +34,7 @@ export default function WishlistPage() {
 
     return (
         <div className="p-4">
-            <h1 className="text-xl font-bold mb-4">Wishlist</h1>
+            <h1 className="text-2xl font-bold text-blue-900 mb-4">Wishlist</h1>
 
             {wishlist.length === 0 ? (
                 <EmptyWishlist />

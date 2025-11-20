@@ -22,7 +22,7 @@ export default function Topbar({ toggleSidebar, isOpen }) {
   return (
     <>
       <header
-        className={`fixed top-0 right-0 h-16 flex items-center justify-between px-6 transition-all duration-300
+        className={`fixed top-0 right-0 h-18 flex items-center justify-between px-6 transition-all duration-300
           ${isOpen ? "left-64" : "left-20"} bg-white/80 backdrop-blur-md border-b border-blue-200 shadow-md z-40`}
       >
         <button

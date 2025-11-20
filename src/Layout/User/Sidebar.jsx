@@ -1,17 +1,18 @@
-// SidebarClean.jsx
 "use client";
-import { Home, Heart, History, User, FileWarning } from "lucide-react";
+import { Home, Heart, History, User, FileCheck, CircleDollarSign } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
+
   const menus = [
     { name: "Beranda", icon: <Home size={20} />, path: "/user/home" },
     { name: "Wishlist", icon: <Heart size={20} />, path: "/user/wishlist" },
     { name: "Riwayat", icon: <History size={20} />, path: "/user/riwayat" },
-    { name: "Laporan", icon: <FileWarning size={20} />, path: "/user/laporan" },
+    { name: "Pengembalian", icon: <FileCheck size={20} />, path: "/user/pengembalian" },
+    { name: "Denda", icon: <CircleDollarSign size={20} />, path: "/user/denda" },
     { name: "Profil", icon: <User size={20} />, path: "/user/profile" },
   ];
 

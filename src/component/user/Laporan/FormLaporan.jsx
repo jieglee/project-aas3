@@ -1,66 +1,23 @@
-"use client";
-
-import InputSelect from "./InputSelect";
-import InputText from "./InputText";
-import InputTextarea from "./InputTextarea";
-import UploadFoto from "./UploadFoto";
-
-export default function FormLaporan({
-    form,
-    handleChange,
-    handleFile,
-    handleSubmit,
-    preview
-}) {
+export default function BookInfo({ book }) {
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="bg-white shadow-md p-6 rounded-xl max-w-2xl space-y-5 border border-gray-200"
-        >
-            <InputSelect
-                label="Jenis Laporan"
-                name="jenis"
-                value={form.jenis}
-                onChange={handleChange}
-            >
-                <option value="">Pilih jenis laporan...</option>
-                <option value="Hilang">Buku Hilang</option>
-                <option value="Rusak">Buku Rusak</option>
-                <option value="Lainnya">Lainnya</option>
-            </InputSelect>
+        <div className="border border-gray-300 p-4 rounded-xl shadow-md mb-6">
+            <h2 className="text-xl font-semibold text-blue-900 mb-3">
+                Buku yang Dipinjam
+            </h2>
 
-            <InputText
-                label="Judul Buku"
-                name="judul"
-                value={form.judul}
-                onChange={handleChange}
-                placeholder="Contoh: Laskar Pelangi"
-            />
-
-            <InputText
-                label="Kode Buku"
-                name="kodeBuku"
-                value={form.kodeBuku}
-                onChange={handleChange}
-                placeholder="Contoh: BK-0931"
-            />
-
-            <InputTextarea
-                label="Deskripsi Masalah"
-                name="deskripsi"
-                value={form.deskripsi}
-                onChange={handleChange}
-                placeholder="Jelaskan kondisi buku atau kronologinya..."
-            />
-
-            <UploadFoto preview={preview} onChange={handleFile} />
-
-            <button
-                type="submit"
-                className="w-full bg-blue-900 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-            >
-                Kirim Laporan
-            </button>
-        </form>
+            <div className="flex gap-4">
+                <img
+                    src={book.img}
+                    alt={book.judul}
+                    className="w-28 h-36 object-cover rounded-lg"
+                />
+                <div>
+                    <p className="font-bold text-lg">{book.judul}</p>
+                    <p className="text-gray-600">Penulis: {book.penulis}</p>
+                    <p className="text-gray-600">Penerbit: {book.penerbit}</p>
+                    <p className="text-gray-600">Tahun: {book.tahun_terbit}</p>
+                </div>
+            </div>
+        </div>
     );
 }
