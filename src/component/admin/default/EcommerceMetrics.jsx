@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Badge from "../../ui/Badge"; // pastikan shadcn badge sudah di-generate
+import Badge from "../../ui/Badge"; 
 import { FiArrowUp, FiArrowDown, FiBox, FiClock } from "react-icons/fi";
 
 const LibraryMetrics = () => {

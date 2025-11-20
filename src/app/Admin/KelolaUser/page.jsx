@@ -6,7 +6,6 @@ import AddUserButton from "../../../component/admin/kelolauser/AddUserButton";
 import UserTable from "../../../component/admin/kelolauser/UserTable";
 import UserModal from "../../../component/admin/kelolauser/UserModal";
 
-
 export default function KelolaUserPage() {
     const [users, setUsers] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
@@ -61,11 +60,15 @@ export default function KelolaUserPage() {
                 {/* HEADER CARD */}
                 <div className="bg-white rounded-lg shadow p-6 border border-gray-200 flex justify-between items-start">
                     <div>
-                        <h1 className="text-xl font-bold flex items-center gap-3 text-gray-800">
-                            <BsPeople className="text-blue-600" size={22} />
+                        <h1 className="text-xl font-bold gi flex items-center gap-3 text-gray-800">
+                            <span className="bg-blue-100 text-blue-600 p-2 rounded-md flex items-center justify-center">
+                                <BsPeople size={22} />
+                            </span>
                             Kelola Users
                         </h1>
-                        <p className="text-gray-500 text-sm mt-1">Manajemen data pengguna perpustakaan</p>
+                        <p className="text-gray-500 text-sm mt-1">
+                            Manajemen data pengguna perpustakaan
+                        </p>
                     </div>
 
                     <div>

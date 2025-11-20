@@ -1,0 +1,39 @@
+"use client";
+
+import { BookOpen, Plus } from "lucide-react";
+import SearchBuku from "../../../component/admin/kelolabuku/";
+
+export default function KelolaBukuHeader({ query, setQuery }) {
+    return (
+        <div className="bg-white p-5 rounded-xl shadow-sm border">
+            
+            {/* === HEADER UTAMA === */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                {/* KIRI: ICON + TITLE */}
+                <div>
+                    <div className="flex items-center gap-2">
+                        <BookOpen className="text-blue-600" size={28} />
+                        <h1 className="text-2xl font-bold">Kelola Buku</h1>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-1">
+                        Manajemen data buku perpustakaan
+                    </p>
+                </div>
+
+                {/* KANAN: BUTTON TAMBAH */}
+                <button className="
+                    bg-blue-600 hover:bg-blue-700 text-white px-4 py-2
+                    rounded-lg flex items-center gap-2 text-sm font-medium
+                ">
+                    <Plus size={18} /> Tambah Buku
+                </button>
+            </div>
+
+            {/* === SEARCH DI BAWAH HEADER === */}
+            <div className="mt-4">
+                <SearchBuku query={query} setQuery={setQuery} />
+            </div>
+        </div>
+    );
+}
