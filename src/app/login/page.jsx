@@ -33,7 +33,7 @@ export default function Login() {
 
             // redirect sesuai role
             if (data.user.role === "admin") {
-                router.push("/admin/dashboard");
+                router.push("/Admin");
             } else {
                 router.push("/user/home");
             }
