@@ -27,12 +27,16 @@ export default function Login() {
                 return;
             }
 
-            // simpan user di localStorage
-  localStorage.setItem("userId", data.user.id);
+            // simpan info user di localStorage
+            localStorage.setItem("userId", data.user.id);
+            localStorage.setItem("userRole", data.user.role);
 
-
-            // arahkan ke halaman home
-            router.push("/user/home");
+            // redirect sesuai role
+            if (data.user.role === "admin") {
+                router.push("/admin/dashboard");
+            } else {
+                router.push("/user/home");
+            }
         } catch (err) {
             console.error(err);
             setError("Terjadi kesalahan, coba lagi!");
@@ -43,6 +47,7 @@ export default function Login() {
         <div className="bg-gray-100 lg:h-screen flex items-center justify-center p-4">
             <div className="max-w-6xl bg-white shadow-lg p-6 lg:p-8 rounded-2xl">
                 <div className="grid md:grid-cols-2 items-center gap-y-8">
+                    {/* Bagian gambar kiri */}
                     <div className="w-full h-full">
                         <div className="aspect-square bg-gray-50 relative before:absolute before:inset-0 before:bg-indigo-600/70 rounded-md overflow-hidden w-full h-full">
                             <img
@@ -62,6 +67,7 @@ export default function Login() {
                         </div>
                     </div>
 
+                    {/* Form login */}
                     <form onSubmit={handleLogin} className="max-w-md mx-auto w-full p-4 md:p-6">
                         <h2 className="text-2xl font-semibold text-center text-blue-800 mb-8">
                             Login Akun
@@ -83,6 +89,7 @@ export default function Login() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Masukkan Email"
                                 className="w-full p-3 border-2 border-blue-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-sm"
+                                required
                             />
                         </div>
 
@@ -96,6 +103,7 @@ export default function Login() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Password"
                                 className="w-full p-3 border-2 border-blue-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-sm"
+                                required
                             />
                         </div>
 

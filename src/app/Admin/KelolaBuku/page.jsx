@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import HeaderKelolaBuku from "../../../component/admin/kelolabuku/HeaderKelolaBuku";
-import SearchBuku from "../../../component/admin/kelolabuku/SearchBuku";
 import TabelBuku from "../../../component/admin/kelolabuku/TabelBuku";
 
 export default function KelolaBukuPage() {
@@ -29,16 +28,11 @@ export default function KelolaBukuPage() {
 
     return (
         <div className="p-6 space-y-6">
-
-            {/* HEADER PUTIH */}
-            <HeaderKelolaBuku />
-
-            {/* SEARCH PANJANG */}
-            <SearchBuku query={query} setQuery={setQuery} />
+            {/* HEADER PUTIH + SEARCH */}
+            <HeaderKelolaBuku query={query} setQuery={setQuery} />
 
             {/* TABLE */}
             <TabelBuku books={filteredBooks} reload={fetchBooks} />
-
         </div>
     );
 }

@@ -11,18 +11,30 @@ export const metadata = {
 
 export default function Ecommerce() {
   return (
-    <div className="grid grid-cols-12 gap-4 md:gap-6">
-      <div className="col-span-12 space-y-6 xl:col-span-7">
-        <EcommerceMetrics />
-        <MonthlySalesChart />
+    <div className="p-6 grid grid-cols-12 gap-6">
+      {/* Kiri: Metrics + Sales Chart */}
+      <div className="col-span-12 xl:col-span-8 space-y-6">
+        <div className="bg-white rounded-xl shadow p-6">
+          <EcommerceMetrics />
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-6">
+          <MonthlySalesChart />
+        </div>
       </div>
 
-      <div className="col-span-12 xl:col-span-5">
-        <MonthlyTarget />
+      {/* Kanan: Monthly Target */}
+      <div className="col-span-12 xl:col-span-4 space-y-6">
+        <div className="bg-white rounded-xl shadow p-6">
+          <MonthlyTarget />
+        </div>
       </div>
 
+      {/* Bawah: Statistik Chart full-width */}
       <div className="col-span-12">
-        <StatisticsChart />
+        <div className="bg-white rounded-xl shadow p-6">
+          <StatisticsChart />
+        </div>
       </div>
     </div>
   );

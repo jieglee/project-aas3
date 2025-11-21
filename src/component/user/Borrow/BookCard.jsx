@@ -1,31 +1,43 @@
 "use client";
+
 import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function BookCard({ book }) {
+  if (!book) return <p>Buku tidak ditemukan</p>;
+
+  // ---- FIX PALING AMAN ----
+  // Cek apakah img adalah URL lengkap (http/https)
+  const isValidUrl = (url) => {
+    if (!url || typeof url !== "string") return false;
+    return url.startsWith("http://") || url.startsWith("https://");
+  };
+
+  // Tentukan URL gambar yang pasti valid
+  const imageSrc = isValidUrl(book.img)
+    ? book.img
+    : "/placeholder-book.jpg"; // fallback aman
+
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="bg-white shadow-lg rounded-2xl p-5 flex flex-col md:flex-row items-center md:items-start gap-5 cursor-pointer transition-transform"
+      className="bg-white shadow-md rounded-xl p-6 flex flex-col gap-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
     >
-      {book ? (
-        <>
-          <Image
-            src={`/buku/${book.img}`}
-            width={160}
-            height={220}
-            className="rounded-xl shadow-md"
-            alt={book.judul || "Book cover"}
-          />
-          <div className="flex-1">
-            <h2 className="text-xl font-bold mb-1 text-blue-800">{book.judul}</h2>
-            <p className="text-gray-600 mb-2">{book.penulis}</p>
-            <p className="text-gray-700 text-sm ">{book.deskripsi}</p>
-          </div>
-        </>
-      ) : (
-        <p className="text-gray-500">Buku tidak ditemukan</p>
-      )}
+      <div className="relative w-full h-64">
+        <Image
+          src={imageSrc}
+          alt={book.judul || "Book Image"}
+          fill
+          className="object-cover rounded-lg"
+        />
+      </div>
+
+      <div>
+        <h2 className="text-xl font-semibold">{book.judul}</h2>
+        <p className="text-gray-600">{book.penulis}</p>
+        <p className="mt-2 text-sm text-gray-500">{book.deskripsi}</p>
+      </div>
     </motion.div>
   );
 }
