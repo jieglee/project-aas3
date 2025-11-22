@@ -28,10 +28,8 @@ export default function KelolaUserPage() {
         fetchUsers();
     }, []);
 
-    // search handler (client-side quick)
     const handleSearch = (q) => {
         setQuery(q);
-        // simple client filter; you can change to query server if large data
         if (!q) return fetchUsers();
         const lower = q.toLowerCase();
         const filtered = users.filter(
@@ -54,14 +52,14 @@ export default function KelolaUserPage() {
     };
 
     return (
-        <div className="p-6 bg-white min-h-screen">
-            <div className="max-w-6xl mx-auto space-y-4">
+        <div className="p-6 bg-gray-100 min-h-screen">
+            <div className="max-w-7xl mx-auto space-y-6">
 
-                {/* HEADER CARD */}
-                <div className="bg-white rounded-lg shadow p-6 border border-gray-200 flex justify-between items-start">
+                {/* HEADER */}
+                <div className="bg-white rounded-xl shadow p-6 border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-xl font-bold gi flex items-center gap-3 text-gray-800">
-                            <span className="bg-blue-100 text-blue-600 p-2 rounded-md flex items-center justify-center">
+                        <h1 className="text-2xl font-bold flex items-center gap-3 text-gray-800">
+                            <span className="bg-blue-100 text-blue-600 p-3 rounded-md flex items-center justify-center">
                                 <BsPeople size={22} />
                             </span>
                             Kelola Users
@@ -70,23 +68,23 @@ export default function KelolaUserPage() {
                             Manajemen data pengguna perpustakaan
                         </p>
                     </div>
-
                     <div>
                         <AddUserButton onClick={openAdd} />
                     </div>
                 </div>
 
-                {/* SEARCH CARD */}
-                <div className="bg-white rounded-lg p-4 shadow border border-gray-200">
+                {/* SEARCH */}
+                <div className="bg-white rounded-xl p-4 shadow border border-gray-200">
                     <SearchBar onSearch={handleSearch} />
                 </div>
 
-                {/* TABLE CARD */}
-                <div className="bg-white rounded-lg p-4 shadow border border-gray-200">
+                {/* TABLE */}
+                <div className="bg-white rounded-xl p-4 shadow border border-gray-200 overflow-x-auto">
                     <UserTable users={users} fetchUsers={fetchUsers} onEdit={openEdit} />
                 </div>
             </div>
 
+            {/* MODAL */}
             <UserModal
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}

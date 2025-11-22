@@ -2,11 +2,23 @@ import { db } from "../../../lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
-export async function GET() {
+export async function GET(req) {
     try {
-        const [rows] = await db.query(
-            "SELECT id, nama, kelas, email, phone, role, created_at FROM users ORDER BY id DESC"
-        );
+        const { searchParams } = new URL(req.url);
+        const search = searchParams.get("search");
+
+        let query = "SELECT id, nama, kelas, email, phone, role, created_at FROM users";
+        let params = [];
+
+        if (search) {
+            query += " WHERE nama LIKE ? OR email LIKE ? OR kelas LIKE ?";
+            const searchTerm = `%${search}%`;
+            params = [searchTerm, searchTerm, searchTerm];
+        }
+
+        query += " ORDER BY id DESC";
+
+        const [rows] = await db.query(query, params);
         return NextResponse.json(rows);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -19,8 +31,21 @@ export async function POST(req) {
         const { nama, kelas = "", email, phone = "", password = "", role = "user" } = data;
 
         if (!nama || !email) 
-            return NextResponse.json({ error: "nama & email required" }, { status: 400 });
+            return NextResponse.json({ error: "Nama & email wajib diisi" }, { status: 400 });
 
+        // Validasi email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json({ error: "Format email tidak valid" }, { status: 400 });
+        }
+
+        // Cek apakah email sudah terdaftar
+        const [existing] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
+        if (existing.length > 0) {
+            return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
+        }
+
+        // Hash password jika ada
         let hashed = null;
         if (password) {
             const salt = await bcrypt.genSalt(10);

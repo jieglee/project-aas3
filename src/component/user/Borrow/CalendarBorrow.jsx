@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 export default function CalendarBorrow({
     borrowDate,
     setBorrowDate,
@@ -10,8 +12,11 @@ export default function CalendarBorrow({
     lateDays,
     fine,
 }) {
+    // fallback agar currentMonth tidak undefined
+    const month = currentMonth || new Date();
+
     const handleDateClick = (day) => {
-        const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+        const newDate = new Date(month.getFullYear(), month.getMonth(), day);
         setBorrowDate(newDate);
 
         const newReturn = new Date(newDate);
@@ -20,16 +25,16 @@ export default function CalendarBorrow({
     };
 
     const changeMonth = (delta) => {
-        const newMonth = new Date(currentMonth);
+        const newMonth = new Date(month);
         newMonth.setMonth(newMonth.getMonth() + delta);
         setCurrentMonth(newMonth);
     };
 
     const renderCalendar = () => {
-        const year = currentMonth.getFullYear();
-        const month = currentMonth.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const year = month.getFullYear();
+        const m = month.getMonth();
+        const firstDay = new Date(year, m, 1).getDay();
+        const daysInMonth = new Date(year, m + 1, 0).getDate();
 
         const days = [];
 
@@ -37,61 +42,56 @@ export default function CalendarBorrow({
 
         for (let day = 1; day <= daysInMonth; day++) {
             const isSelected =
-                borrowDate.getDate() === day && borrowDate.getMonth() === month;
+                borrowDate &&
+                borrowDate.getDate() === day &&
+                borrowDate.getMonth() === m &&
+                borrowDate.getFullYear() === year;
 
             days.push(
-                <div
+                <button
                     key={day}
-                    className={`cursor-pointer flex justify-center items-center p-1 rounded-full text-sm ${
-                        isSelected
-                            ? "bg-blue-900 text-white"
-                            : "hover:bg-blue-200 text-black"
-                    }`}
                     onClick={() => handleDateClick(day)}
+                    className={`cursor-pointer flex justify-center items-center p-1 rounded-full text-sm ${isSelected ? "bg-blue-900 text-white" : "hover:bg-blue-200 text-black"
+                        }`}
                 >
                     {day}
-                </div>
+                </button>
             );
         }
         return days;
     };
 
     return (
-        <div className="bg-white p-4 rounded-2xl border border-blue-400 text-sm">
+        <div className="bg-white p-3 rounded-2xl border border-blue-300 text-xs shadow-sm">
             <div className="flex justify-between items-center mb-2">
-                <button onClick={() => changeMonth(-1)} className="text-blue-500 text-lg">
-                    &lt;
-                </button>
-                <h2 className="font-semibold text-gray-700 text-sm">
-                    {currentMonth.toLocaleString("default", { month: "long" })}{" "}
-                    {currentMonth.getFullYear()}
-                </h2>
-                <button onClick={() => changeMonth(1)} className="text-blue-500 text-lg">
-                    &gt;
-                </button>
+                <button onClick={() => changeMonth(-1)} className="text-blue-500">&lt;</button>
+                <span className="font-semibold text-gray-700">
+                    {month.toLocaleString("default", { month: "long" })} {month.getFullYear()}
+                </span>
+                <button onClick={() => changeMonth(1)} className="text-blue-500">&gt;</button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center text-gray-500 font-semibold text-xs">
-                {["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"].map((d) => (
+            <div className="grid grid-cols-7 gap-1 text-center text-gray-500 font-semibold mb-1">
+                {["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"].map(d => (
                     <div key={d}>{d}</div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1 mt-1">{renderCalendar()}</div>
+            <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
 
-            <p className="text-xs text-gray-600 mt-2">
-                Tanggal Peminjaman: <span className="font-semibold">{borrowDate.toLocaleDateString()}</span>
-            </p>
-
-            <p className="text-xs text-gray-600">
-                Tanggal Pengembalian: <span className="font-semibold">{returnDate.toLocaleDateString()}</span>
-            </p>
-
-            {lateDays > 0 && (
-                <p className="text-xs text-red-600 font-semibold mt-2">
-                    Terlambat {lateDays} hari — Denda: Rp {fine.toLocaleString()}
+            <div className="mt-2 space-y-1">
+                <p className="text-gray-600 text-xs">
+                    Tanggal Peminjaman: <span className="font-semibold">{borrowDate?.toLocaleDateString()}</span>
                 </p>
-            )}
+                <p className="text-gray-600 text-xs">
+                    Tanggal Pengembalian: <span className="font-semibold">{returnDate?.toLocaleDateString()}</span>
+                </p>
+                {lateDays > 0 && (
+                    <p className="text-red-600 font-semibold text-xs">
+                        Terlambat {lateDays} hari — Denda: Rp {fine.toLocaleString()}
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

@@ -6,8 +6,8 @@ import Link from "next/link";
 export default function Recommended({ books, loading }) {
     if (loading) {
         return (
-            <section className="mb-12">
-                <div className="flex items-center gap-2 mb-6">
+            <section className="mb-16">
+                <div className="flex items-center gap-2 mb-8">
                     <TrendingUp className="w-6 h-6 text-blue-600" />
                     <h2 className="text-2xl font-bold text-gray-900">Rekomendasi Untuk Anda</h2>
                 </div>
@@ -23,8 +23,8 @@ export default function Recommended({ books, loading }) {
     if (books.length === 0) return null;
 
     return (
-        <section className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
+        <section className="mb-16">
+            <div className="flex items-center gap-2 mb-8">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
                 <h2 className="text-2xl font-bold text-gray-900">Rekomendasi Untuk Anda</h2>
             </div>

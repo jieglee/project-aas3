@@ -3,14 +3,11 @@
 import { BookOpen, Plus } from "lucide-react";
 import SearchBuku from "../../../component/admin/kelolabuku/SearchBuku";
 
-export default function KelolaBukuHeader({ query, setQuery }) {
+export default function KelolaBukuHeader({ query, setQuery, onAdd }) {
     return (
         <div className="bg-white p-5 rounded-xl shadow-sm border">
-            
-            {/* === HEADER UTAMA === */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                {/* KIRI: ICON + TITLE */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-2">
                         <BookOpen className="text-blue-600" size={28} />
@@ -21,16 +18,15 @@ export default function KelolaBukuHeader({ query, setQuery }) {
                     </p>
                 </div>
 
-                {/* KANAN: BUTTON TAMBAH */}
-                <button className="
-                    bg-blue-900 hover:bg-blue-700 text-white px-4 py-2
-                    rounded-lg flex items-center gap-2 text-sm font-medium
-                ">
+                {/* OPEN MODAL */}
+                <button
+                    onClick={onAdd}
+                    className="bg-blue-900 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
+                >
                     <Plus size={18} /> Tambah Buku
                 </button>
             </div>
 
-            {/* === SEARCH DI BAWAH HEADER === */}
             <div className="mt-4">
                 <SearchBuku query={query} setQuery={setQuery} />
             </div>

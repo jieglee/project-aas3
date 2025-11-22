@@ -1,15 +1,27 @@
 "use client";
 
-import { BookOpen } from "lucide-react";
+import { Heart, BookOpen } from "lucide-react";
 
-export default function BookCard({ book }) {
+export default function BookCard({ book, onRemove }) {
     const imgSrc = book.img ? `/buku/${book.img}` : "/api/placeholder/200/280";
     const kategori = book.kategori || "Tanpa Kategori";
     const stok = book.stok ?? 0;
     const penerbit = book.penerbit || "-";
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 relative">
+            {/* Heart Button */}
+            <button
+                onClick={(e) => {
+                    e.preventDefault();
+                    onRemove(book.wishlist_id);
+                }}
+                className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-red-50 transition-all group/btn"
+                title="Hapus dari wishlist"
+            >
+                <Heart className="w-4 h-4 text-red-500 group-hover/btn:text-red-700 transition-colors" />
+            </button>
+
             <div className="relative w-full h-64 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
                 <img
                     src={imgSrc}
@@ -17,12 +29,10 @@ export default function BookCard({ book }) {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
 
-                {/* Kategori */}
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-blue-900">
                     {kategori}
                 </div>
 
-                {/* Stok Habis */}
                 {stok === 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                         <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">
@@ -45,11 +55,10 @@ export default function BookCard({ book }) {
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                     <span className="text-xs text-gray-500">{penerbit}</span>
                     <span
-                        className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                            stok > 0
+                        className={`text-xs font-semibold px-2 py-1 rounded-full ${stok > 0
                                 ? "bg-green-100 text-green-700"
                                 : "bg-red-100 text-red-700"
-                        }`}
+                            }`}
                     >
                         Stok: {stok}
                     </span>

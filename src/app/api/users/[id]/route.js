@@ -1,12 +1,20 @@
 import db from "../../../../../lib/db";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export async function GET(req, { params }) {
     try {
         const { id } = params;
-        const [rows] = await db.query("SELECT id, nama, kelas, email, phone, role, created_at FROM users WHERE id = ?", [id]);
-        return NextResponse.json(rows[0] || {});
+        const [rows] = await db.query(
+            "SELECT id, nama, kelas, email, phone, role, created_at FROM users WHERE id = ?", 
+            [id]
+        );
+        
+        if (rows.length === 0) {
+            return NextResponse.json({ error: "User tidak ditemukan" }, { status: 404 });
+        }
+        
+        return NextResponse.json(rows[0]);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
@@ -18,14 +26,33 @@ export async function PUT(req, { params }) {
         const body = await req.json();
         const { nama, kelas = "", email, phone = "", password, role = "user" } = body;
 
-        if (!nama || !email) return NextResponse.json({ error: "nama & email required" }, { status: 400 });
+        if (!nama || !email) {
+            return NextResponse.json({ error: "Nama & email wajib diisi" }, { status: 400 });
+        }
 
+        // Validasi email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json({ error: "Format email tidak valid" }, { status: 400 });
+        }
+
+        // Cek apakah email sudah digunakan user lain
+        const [existing] = await db.query(
+            "SELECT id FROM users WHERE email = ? AND id != ?", 
+            [email, id]
+        );
+        if (existing.length > 0) {
+            return NextResponse.json({ error: "Email sudah digunakan oleh user lain" }, { status: 400 });
+        }
+
+        // Hash password jika diisi
         let hashed = null;
-        if (password) {
+        if (password && password.trim() !== "") {
             const salt = await bcrypt.genSalt(10);
             hashed = await bcrypt.hash(password, salt);
         }
 
+        // Update dengan atau tanpa password
         if (hashed) {
             await db.query(
                 "UPDATE users SET nama = ?, kelas = ?, email = ?, phone = ?, password = ?, role = ? WHERE id = ?",
@@ -47,6 +74,13 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
     try {
         const { id } = params;
+        
+        // Cek apakah user ada
+        const [user] = await db.query("SELECT id FROM users WHERE id = ?", [id]);
+        if (user.length === 0) {
+            return NextResponse.json({ error: "User tidak ditemukan" }, { status: 404 });
+        }
+
         await db.query("DELETE FROM users WHERE id = ?", [id]);
         return NextResponse.json({ message: "User berhasil dihapus" });
     } catch (err) {
