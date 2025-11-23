@@ -1,74 +1,101 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Check, Search, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+    Clock, 
+    BookOpen, 
+    AlertTriangle, 
+    Archive, 
+    Search, 
+    Filter,
+    CheckCircle, 
+    XCircle,
+    User
+} from 'lucide-react';
 
-export default function LoanAdminTable() {
-
+export default function LoanManagement() {
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [searchTerm, setSearchTerm] = useState("");
-    const [filterStatus, setFilterStatus] = useState("Semua");
+    const [activeTab, setActiveTab] = useState("Dipinjam");
 
     useEffect(() => {
-        fetch("/api/peminjaman")
-            .then(res => res.json())
-            .then(data => {
-                setLoans(data);
-                setLoading(false);
-            });
+        fetchLoans();
     }, []);
 
-    const handleSelesaiPembayaran = (id) => {
-        setLoans(loans.map(loan =>
-            loan.id === id
-                ? { ...loan, denda_dibayar: true, status: "Dikembalikan" }
-                : loan
-        ));
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Dipinjam": return "bg-blue-100 text-blue-800";
-            case "Dikembalikan": return "bg-green-100 text-green-800";
-            case "Terlambat": return "bg-red-100 text-red-800";
-            case "Diproses": return "bg-yellow-100 text-yellow-800";
-            default: return "bg-gray-100 text-gray-800";
+    const fetchLoans = async () => {
+        try {
+            const res = await fetch("/api/peminjaman");
+            const data = await res.json();
+            setLoans(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Error fetching loans:", err);
+            setLoans([]);
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handleApprove = async (id) => {
+        try {
+            const res = await fetch(`/api/peminjaman/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "Dipinjam" })
+            });
+
+            if (res.ok) {
+                alert("Peminjaman disetujui!");
+                fetchLoans();
+            }
+        } catch (err) {
+            console.error("Error approving loan:", err);
+        }
+    };
+
+    const handleReject = async (id) => {
+        if (!confirm("Yakin ingin menolak peminjaman ini?")) return;
+
+        try {
+            const res = await fetch(`/api/peminjaman/${id}`, {
+                method: "DELETE"
+            });
+
+            if (res.ok) {
+                alert("Peminjaman ditolak!");
+                fetchLoans();
+            }
+        } catch (err) {
+            console.error("Error rejecting loan:", err);
+        }
+    };
+
+    const tabs = [
+        { id: "Diproses", label: "Approval", icon: Clock },
+        { id: "Dipinjam", label: "Aktif", icon: BookOpen },
+        { id: "Terlambat", label: "Terlambat", icon: AlertTriangle },
+        { id: "Dikembalikan", label: "Riwayat", icon: Archive }
+    ];
+
+    const getTabCount = (status) => {
+        return loans.filter(l => l.status === status).length;
+    };
+
     const filteredLoans = loans.filter(loan => {
-        const matchSearch =
+        const matchTab = loan.status === activeTab;
+        const matchSearch = 
             loan.peminjam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             loan.judulBuku?.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchFilter =
-            filterStatus === "Semua" || loan.status === filterStatus;
-
-        return matchSearch && matchFilter;
+        return matchTab && matchSearch;
     });
-
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(amount);
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    };
 
     if (loading) {
         return (
-            <div className="p-6 text-center text-gray-600">
-                Loading data peminjaman...
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Memuat data peminjaman...</p>
+                </div>
             </div>
         );
     }
@@ -76,135 +103,182 @@ export default function LoanAdminTable() {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
-                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6">
-                        Data Peminjaman Buku
-                    </h1>
-
-                    {/* Filter Section */}
-                    <div className="flex flex-col md:flex-row gap-4 mb-6">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Cari nama peminjam atau judul buku..."
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                
+                {/* Header */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 p-3 rounded-xl">
+                            <BookOpen className="w-6 h-6 text-blue-600" />
                         </div>
-
-                        <div className="relative">
-                            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <select
-                                className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                                value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value)}
-                            >
-                                <option>Semua</option>
-                                <option>Diproses</option>
-                                <option>Dipinjam</option>
-                                <option>Dikembalikan</option>
-                                <option>Terlambat</option>
-                            </select>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">Manajemen Peminjaman</h1>
+                            <p className="text-sm text-gray-500">Kelola persetujuan, peminjaman aktif, dan riwayat peminjaman buku</p>
                         </div>
                     </div>
+                </div>
 
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-gray-50 border-b border-gray-200">
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Nama Peminjam</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Judul Buku</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal Pinjam</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal Kembali</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Denda</th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
-                                </tr>
-                            </thead>
+                {/* Tabs */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2 mb-6">
+                    <div className="grid grid-cols-4 gap-2">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            const count = getTabCount(tab.id);
+                            const isActive = activeTab === tab.id;
+                            
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`p-4 rounded-xl transition-all ${
+                                        isActive 
+                                            ? 'bg-blue-600 text-white shadow-md' 
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                                        <div className="text-center">
+                                            <p className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-700'}`}>
+                                                {tab.label}
+                                            </p>
+                                            <p className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-500'}`}>
+                                                ({count})
+                                            </p>
+                                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredLoans.map((loan, index) => (
-                                    <tr key={loan.id} className="hover:bg-gray-50">
-                                        <td className="px-4 py-4">{index + 1}</td>
-                                        <td className="px-4 py-4 font-medium">{loan.peminjam}</td>
-                                        <td className="px-4 py-4">{loan.judulBuku}</td>
-                                        <td className="px-4 py-4">{formatDate(loan.tanggal_pinjam)}</td>
-                                        <td className="px-4 py-4">{formatDate(loan.tanggal_kembali)}</td>
+                {/* Search Bar */}
+                <div className="flex gap-4 mb-6">
+                    <div className="flex-1 bg-gray-100 rounded-2xl px-5 py-4 flex items-center gap-3">
+                        <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                        <input
+                            type="text"
+                            placeholder=""
+                            className="w-full bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 placeholder-gray-400"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button className="bg-gray-100 rounded-2xl px-5 py-4 hover:bg-gray-200 transition-colors">
+                        <Filter className="w-5 h-5 text-gray-400" />
+                    </button>
+                </div>
 
-                                        <td className="px-4 py-4">
-                                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(loan.status)}`}>
-                                                {loan.status}
+                {/* Loan Cards */}
+                <div className="space-y-4">
+                    {filteredLoans.length === 0 ? (
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
+                            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Tidak Ada Data</h3>
+                            <p className="text-gray-500">Belum ada peminjaman dengan status {activeTab}</p>
+                        </div>
+                    ) : (
+                        filteredLoans.map((loan) => (
+                            <div key={loan.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                                <div className="flex gap-6 items-start">
+                                    
+                                    {/* Book Cover */}
+                                    <div className="flex-shrink-0 relative">
+                                        <img
+                                            src={loan.img ? `/buku/${loan.img}` : "/api/placeholder/160/220"}
+                                            alt={loan.judulBuku}
+                                            className="w-40 h-56 object-cover rounded-xl shadow-lg"
+                                        />
+                                    </div>
+
+                                    {/* Book Info */}
+                                    <div className="flex-1 min-w-0">
+                                        {/* Title */}
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <BookOpen className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+                                            <div>
+                                                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                                                    {loan.judulBuku}
+                                                </h3>
+                                                <p className="text-sm text-gray-500">{loan.penulis}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Badges */}
+                                        <div className="flex gap-2 mb-4">
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-semibold">
+                                                03
                                             </span>
-                                        </td>
+                                            <span className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-semibold">
+                                                {loan.kategori || "Fiksi"}
+                                            </span>
+                                        </div>
 
-                                        <td className="px-4 py-4">
-                                            {loan.denda > 0 ? (
-                                                <span className={`font-semibold ${loan.denda_dibayar ? "text-green-600" : "text-red-600"}`}>
-                                                    {formatCurrency(loan.denda)}
-                                                    {loan.denda_dibayar && <span className="ml-2 text-xs">(Lunas)</span>}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-400">-</span>
-                                            )}
-                                        </td>
+                                        {/* Borrower Info */}
+                                        <div className="mb-4">
+                                            <p className="text-xs font-semibold text-gray-500 mb-3">Peminjam</p>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                                                    <User className="w-6 h-6 text-gray-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-900">{loan.peminjam}</p>
+                                                    <p className="text-xs text-gray-500">NIPD: {loan.user_id}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        <td className="px-4 py-4">
-                                            {loan.denda > 0 && !loan.denda_dibayar ? (
+                                    {/* Right Side - Code & Actions */}
+                                    <div className="flex-shrink-0 flex flex-col items-end gap-4 min-w-[220px]">
+                                        {/* Code */}
+                                        <div className="text-right">
+                                            <p className="text-xs font-semibold text-gray-500 mb-1">KODE</p>
+                                            <p className="text-sm font-bold text-gray-900">PJM-{new Date().getFullYear()}{loan.id}-010</p>
+                                        </div>
+
+                                        {/* Action Button */}
+                                        {activeTab === "Diproses" && (
+                                            <div className="w-full space-y-2">
                                                 <button
-                                                    onClick={() => handleSelesaiPembayaran(loan.id)}
-                                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center"
+                                                    onClick={() => handleApprove(loan.id)}
+                                                    className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
                                                 >
-                                                    <Check className="w-4 h-4 mr-2" /> Selesai
+                                                    <CheckCircle className="w-5 h-5" />
+                                                    Setujui
                                                 </button>
-                                            ) : (
-                                                <span className="text-gray-400 text-xs">-</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                                <button
+                                                    onClick={() => handleReject(loan.id)}
+                                                    className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+                                                >
+                                                    <XCircle className="w-5 h-5" />
+                                                    Tolak
+                                                </button>
+                                            </div>
+                                        )}
 
-                    {/* Summary */}
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="text-sm text-blue-600 font-medium">Total Peminjaman</p>
-                                <p className="text-2xl font-bold text-blue-900">{loans.length}</p>
+                                        {activeTab === "Dipinjam" && (
+                                            <div className="w-full px-6 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold text-center">
+                                                Sedang Dipinjam
+                                            </div>
+                                        )}
+
+                                        {activeTab === "Terlambat" && (
+                                            <div className="w-full px-6 py-3 bg-red-100 text-red-700 rounded-xl font-bold text-center">
+                                                Terlambat
+                                            </div>
+                                        )}
+
+                                        {activeTab === "Dikembalikan" && (
+                                            <div className="w-full px-6 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-center">
+                                                Selesai
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-
-                            <div className="bg-yellow-50 p-4 rounded-lg">
-                                <p className="text-sm text-yellow-600 font-medium">Sedang Dipinjam</p>
-                                <p className="text-2xl font-bold text-yellow-900">
-                                    {loans.filter(l => l.status === "Dipinjam").length}
-                                </p>
-                            </div>
-
-                            <div className="bg-red-50 p-4 rounded-lg">
-                                <p className="text-sm text-red-600 font-medium">Terlambat</p>
-                                <p className="text-2xl font-bold text-red-900">
-                                    {loans.filter(l => l.status === "Terlambat").length}
-                                </p>
-                            </div>
-
-                            <div className="bg-green-50 p-4 rounded-lg">
-                                <p className="text-sm text-green-600 font-medium">Total Denda Belum Dibayar</p>
-                                <p className="text-2xl font-bold text-green-900">
-                                    {formatCurrency(
-                                        loans
-                                            .filter(l => !l.denda_dibayar)
-                                            .reduce((sum, l) => sum + l.denda, 0)
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
+                        ))
+                    )}
                 </div>
             </div>
         </div>

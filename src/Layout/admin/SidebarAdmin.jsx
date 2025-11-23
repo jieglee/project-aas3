@@ -8,7 +8,7 @@ export default function SidebarAdmin({ isOpen }) {
   const pathname = usePathname();
 
   const menus = [
-    { name: "Dashboard", icon: <Home size={20} />, path: "/Admin" },
+    { name: "Dashboard", icon: <Home size={20} />, path: "/Admin/Dashboard" },
     { name: "Kelola Users", icon: <Users size={20} />, path: "/Admin/KelolaUser" },
     { name: "Kelola Buku", icon: <Book size={20} />, path: "/Admin/KelolaBuku" },
     { name: "Peminjaman", icon: <ClipboardList size={20} />, path: "/Admin/AdminTable" },

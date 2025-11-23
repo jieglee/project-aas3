@@ -94,7 +94,7 @@ export default function ProfilPage() {
                                 {profile.nama}
                             </h2>
                             <p className="text-gray-400 text-sm mb-3">
-                                {profile.phone || "12345678"}
+                                {profile.kelas || "XI"}
                             </p>
 
                             {/* Role Badge */}
@@ -151,12 +151,6 @@ export default function ProfilPage() {
                                     <span className="text-gray-800 font-medium">
                                         {localStorage.getItem("userId") || "12345678"}
                                     </span>
-                                </div>
-
-                                {/* Role */}
-                                <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                                    <span className="text-gray-500 text-sm">Role</span>
-                                    <span className="text-gray-800 font-medium">user</span>
                                 </div>
 
                                 {/* Anggota Sejak */}
