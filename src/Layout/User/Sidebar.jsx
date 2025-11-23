@@ -1,5 +1,5 @@
 "use client";
-import { Home, Heart, History, User, FileCheck, CircleDollarSign } from "lucide-react";
+import { Home, Heart, History, User, BookCopy } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,9 +10,8 @@ export default function Sidebar({ isOpen }) {
   const menus = [
     { name: "Beranda", icon: <Home size={20} />, path: "/user/home" },
     { name: "Wishlist", icon: <Heart size={20} />, path: "/user/wishlist" },
-    { name: "Riwayat", icon: <History size={20} />, path: "/user/riwayat" },
-    { name: "Pengembalian", icon: <FileCheck size={20} />, path: "/user/pengembalian" },
-    { name: "Denda", icon: <CircleDollarSign size={20} />, path: "/user/denda" },
+    { name: "Katalog", icon: <BookCopy size={20} />, path: "/user/katalog" }, 
+    { name: "Peminjaman", icon: <History size={20} />, path: "/user/peminjam" },
     { name: "Profil", icon: <User size={20} />, path: "/user/profile" },
   ];
 
