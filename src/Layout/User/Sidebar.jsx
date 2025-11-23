@@ -11,7 +11,7 @@ export default function Sidebar({ isOpen }) {
     { name: "Beranda", icon: <Home size={20} />, path: "/user/home" },
     { name: "Wishlist", icon: <Heart size={20} />, path: "/user/wishlist" },
     { name: "Katalog", icon: <BookCopy size={20} />, path: "/user/katalog" }, 
-    { name: "Peminjaman", icon: <History size={20} />, path: "/user/peminjam" },
+    { name: "Peminjaman", icon: <History size={20} />, path: "/user/Peminjaman" },
     { name: "Profil", icon: <User size={20} />, path: "/user/profile" },
   ];
 

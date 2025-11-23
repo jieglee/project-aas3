@@ -10,7 +10,8 @@ import {
     Filter,
     CheckCircle, 
     XCircle,
-    User
+    User,
+    Calendar
 } from 'lucide-react';
 
 export default function LoanManagement() {
@@ -25,6 +26,7 @@ export default function LoanManagement() {
 
     const fetchLoans = async () => {
         try {
+            setLoading(true);
             const res = await fetch("/api/peminjaman");
             const data = await res.json();
             setLoans(Array.isArray(data) ? data : []);
@@ -47,9 +49,12 @@ export default function LoanManagement() {
             if (res.ok) {
                 alert("Peminjaman disetujui!");
                 fetchLoans();
+            } else {
+                alert("Gagal menyetujui peminjaman");
             }
         } catch (err) {
             console.error("Error approving loan:", err);
+            alert("Terjadi kesalahan saat menyetujui peminjaman");
         }
     };
 
@@ -64,9 +69,12 @@ export default function LoanManagement() {
             if (res.ok) {
                 alert("Peminjaman ditolak!");
                 fetchLoans();
+            } else {
+                alert("Gagal menolak peminjaman");
             }
         } catch (err) {
             console.error("Error rejecting loan:", err);
+            alert("Terjadi kesalahan saat menolak peminjaman");
         }
     };
 
@@ -93,192 +101,283 @@ export default function LoanManagement() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Memuat data peminjaman...</p>
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                        <div className="absolute inset-0 border-4 border-blue-200 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p className="text-gray-900 text-lg font-semibold">Memuat data peminjaman...</p>
+                    <p className="text-gray-500 text-sm mt-2">Mohon tunggu sebentar</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-7xl mx-auto">
-                
-                {/* Header */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-blue-100 p-3 rounded-xl">
-                            <BookOpen className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Manajemen Peminjaman</h1>
-                            <p className="text-sm text-gray-500">Kelola persetujuan, peminjaman aktif, dan riwayat peminjaman buku</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2 mb-6">
-                    <div className="grid grid-cols-4 gap-2">
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon;
-                            const count = getTabCount(tab.id);
-                            const isActive = activeTab === tab.id;
-                            
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`p-4 rounded-xl transition-all ${
-                                        isActive 
-                                            ? 'bg-blue-600 text-white shadow-md' 
-                                            : 'text-gray-600 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-400'}`} />
-                                        <div className="text-center">
-                                            <p className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-700'}`}>
-                                                {tab.label}
-                                            </p>
-                                            <p className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-500'}`}>
-                                                ({count})
-                                            </p>
-                                        </div>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Search Bar */}
-                <div className="flex gap-4 mb-6">
-                    <div className="flex-1 bg-gray-100 rounded-2xl px-5 py-4 flex items-center gap-3">
-                        <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                        <input
-                            type="text"
-                            placeholder=""
-                            className="w-full bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 placeholder-gray-400"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                    <button className="bg-gray-100 rounded-2xl px-5 py-4 hover:bg-gray-200 transition-colors">
-                        <Filter className="w-5 h-5 text-gray-400" />
-                    </button>
-                </div>
-
-                {/* Loan Cards */}
-                <div className="space-y-4">
-                    {filteredLoans.length === 0 ? (
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
-                            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Tidak Ada Data</h3>
-                            <p className="text-gray-500">Belum ada peminjaman dengan status {activeTab}</p>
-                        </div>
-                    ) : (
-                        filteredLoans.map((loan) => (
-                            <div key={loan.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                                <div className="flex gap-6 items-start">
-                                    
-                                    {/* Book Cover */}
-                                    <div className="flex-shrink-0 relative">
-                                        <img
-                                            src={loan.img ? `/buku/${loan.img}` : "/api/placeholder/160/220"}
-                                            alt={loan.judulBuku}
-                                            className="w-40 h-56 object-cover rounded-xl shadow-lg"
-                                        />
-                                    </div>
-
-                                    {/* Book Info */}
-                                    <div className="flex-1 min-w-0">
-                                        {/* Title */}
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <BookOpen className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-                                            <div>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                                                    {loan.judulBuku}
-                                                </h3>
-                                                <p className="text-sm text-gray-500">{loan.penulis}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Badges */}
-                                        <div className="flex gap-2 mb-4">
-                                            <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-semibold">
-                                                03
-                                            </span>
-                                            <span className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-xs font-semibold">
-                                                {loan.kategori || "Fiksi"}
-                                            </span>
-                                        </div>
-
-                                        {/* Borrower Info */}
-                                        <div className="mb-4">
-                                            <p className="text-xs font-semibold text-gray-500 mb-3">Peminjam</p>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                                                    <User className="w-6 h-6 text-gray-500" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-gray-900">{loan.peminjam}</p>
-                                                    <p className="text-xs text-gray-500">NIPD: {loan.user_id}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Right Side - Code & Actions */}
-                                    <div className="flex-shrink-0 flex flex-col items-end gap-4 min-w-[220px]">
-                                        {/* Code */}
-                                        <div className="text-right">
-                                            <p className="text-xs font-semibold text-gray-500 mb-1">KODE</p>
-                                            <p className="text-sm font-bold text-gray-900">PJM-{new Date().getFullYear()}{loan.id}-010</p>
-                                        </div>
-
-                                        {/* Action Button */}
-                                        {activeTab === "Diproses" && (
-                                            <div className="w-full space-y-2">
-                                                <button
-                                                    onClick={() => handleApprove(loan.id)}
-                                                    className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-                                                >
-                                                    <CheckCircle className="w-5 h-5" />
-                                                    Setujui
-                                                </button>
-                                                <button
-                                                    onClick={() => handleReject(loan.id)}
-                                                    className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-                                                >
-                                                    <XCircle className="w-5 h-5" />
-                                                    Tolak
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {activeTab === "Dipinjam" && (
-                                            <div className="w-full px-6 py-3 bg-blue-100 text-blue-700 rounded-xl font-bold text-center">
-                                                Sedang Dipinjam
-                                            </div>
-                                        )}
-
-                                        {activeTab === "Terlambat" && (
-                                            <div className="w-full px-6 py-3 bg-red-100 text-red-700 rounded-xl font-bold text-center">
-                                                Terlambat
-                                            </div>
-                                        )}
-
-                                        {activeTab === "Dikembalikan" && (
-                                            <div className="w-full px-6 py-3 bg-green-100 text-green-700 rounded-xl font-bold text-center">
-                                                Selesai
-                                            </div>
-                                        )}
-                                    </div>
+        <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen p-8">
+                <div className="max-w-7xl mx-auto">
+                    
+                    {/* Header - Elegant with Blue */}
+                    <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 mb-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-5">
+                                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl shadow-lg">
+                                    <BookOpen className="w-8 h-8 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-1">
+                                        Manajemen Peminjaman
+                                    </h1>
+                                    <p className="text-gray-600">Kelola dan monitor aktivitas peminjaman perpustakaan</p>
                                 </div>
                             </div>
-                        ))
-                    )}
+                            <div className="text-right">
+                                <p className="text-sm text-gray-500 mb-1">Total Transaksi</p>
+                                <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                                    {loans.length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tabs - Elegant with Colors */}
+                    <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-3 mb-8">
+                        <div className="grid grid-cols-4 gap-3">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon;
+                                const count = getTabCount(tab.id);
+                                const isActive = activeTab === tab.id;
+                                
+                                // Elegant color schemes
+                                let gradientClass = '';
+                                let shadowClass = '';
+                                
+                                if (tab.id === "Diproses") {
+                                    gradientClass = isActive ? 'from-orange-400 to-orange-600' : '';
+                                    shadowClass = isActive ? 'shadow-orange-200' : '';
+                                } else if (tab.id === "Dipinjam") {
+                                    gradientClass = isActive ? 'from-blue-400 to-blue-600' : '';
+                                    shadowClass = isActive ? 'shadow-blue-200' : '';
+                                } else if (tab.id === "Terlambat") {
+                                    gradientClass = isActive ? 'from-red-400 to-red-600' : '';
+                                    shadowClass = isActive ? 'shadow-red-200' : '';
+                                } else {
+                                    gradientClass = isActive ? 'from-gray-400 to-gray-600' : '';
+                                    shadowClass = isActive ? 'shadow-gray-200' : '';
+                                }
+                                
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`relative p-5 rounded-2xl transition-all duration-300 ${
+                                            isActive 
+                                                ? `bg-gradient-to-br ${gradientClass} text-white shadow-xl ${shadowClass} scale-105` 
+                                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:shadow-lg'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className={`p-3 rounded-xl transition-all ${
+                                                isActive ? 'bg-white/20' : 'bg-white shadow-sm'
+                                            }`}>
+                                                <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                                            </div>
+                                            <div className="text-center">
+                                                <p className={`text-sm font-bold mb-1 ${isActive ? 'text-white' : 'text-gray-700'}`}>
+                                                    {tab.label}
+                                                </p>
+                                                <p className={`text-2xl font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                                                    {count}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Search Bar - Elegant */}
+                    <div className="flex gap-4 mb-8">
+                        <div className="flex-1 bg-white rounded-2xl px-6 py-4 flex items-center gap-3 shadow-lg border border-gray-200">
+                            <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Cari peminjam atau judul buku..."
+                                className="w-full bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 placeholder-gray-400"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            {searchTerm && (
+                                <button 
+                                    onClick={() => setSearchTerm("")}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <XCircle className="w-5 h-5" />
+                                </button>
+                            )}
+                        </div>
+                        <button className="bg-white rounded-2xl px-6 py-4 hover:bg-gray-50 transition-all shadow-lg border border-gray-200">
+                            <Filter className="w-5 h-5 text-gray-600" />
+                        </button>
+                    </div>
+
+                    {/* Loan Cards - Elegant Design without Right Card */}
+                    <div className="space-y-5">
+                        {filteredLoans.length === 0 ? (
+                            <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-16 text-center">
+                                <div className="bg-gradient-to-br from-gray-100 to-gray-200 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <BookOpen className="w-12 h-12 text-gray-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Tidak Ada Data Peminjaman</h3>
+                                <p className="text-gray-500">Belum ada peminjaman dengan status <span className="font-semibold">{activeTab}</span></p>
+                            </div>
+                        ) : (
+                            filteredLoans.map((loan) => (
+                                <div key={loan.id} className="bg-white rounded-3xl shadow-xl border border-gray-200 p-7 hover:shadow-2xl transition-all duration-300 group">
+                                    <div className="flex gap-6 items-start">
+                                        
+                                        {/* Book Cover - Elegant */}
+                                        <div className="flex-shrink-0 relative">
+                                            <div className="relative overflow-hidden rounded-2xl shadow-2xl ring-4 ring-gray-100">
+                                                <img
+                                                    src={loan.img ? `/buku/${loan.img}` : "/api/placeholder/160/220"}
+                                                    alt={loan.judulBuku || "Book cover"}
+                                                    className="w-40 h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Book Info - Full Width */}
+                                        <div className="flex-1 min-w-0">
+                                            {/* Title & Author */}
+                                            <div className="mb-5">
+                                                <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                                                    {loan.judulBuku || "Judul tidak tersedia"}
+                                                </h3>
+                                                <p className="text-gray-600 font-medium flex items-center gap-2">
+                                                    <User className="w-4 h-4" />
+                                                    {loan.penulis || "Penulis tidak tersedia"}
+                                                </p>
+                                            </div>
+
+                                            {/* Elegant Badges */}
+                                            <div className="flex gap-2 mb-5">
+                                                <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full text-xs font-bold shadow-lg">
+                                                    #{loan.id?.toString().padStart(3, '0') || '000'}
+                                                </span>
+                                                <span className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-full text-xs font-bold shadow-lg">
+                                                    {loan.kategori || "Umum"}
+                                                </span>
+                                            </div>
+
+                                            {/* Borrower & Date in One Row */}
+                                            <div className="grid grid-cols-2 gap-4 mb-5">
+                                                {/* Borrower Card */}
+                                                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-5 border border-gray-200">
+                                                    <p className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">Peminjam</p>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                                            <User className="w-6 h-6 text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-gray-900">{loan.peminjam || "Nama tidak tersedia"}</p>
+                                                            <p className="text-xs text-gray-500 font-medium">NIPD: {loan.user_id || "-"}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Date Info */}
+                                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-5 border border-blue-200">
+                                                    <p className="text-xs font-bold text-blue-600 mb-3 uppercase tracking-wide">Tanggal</p>
+                                                    <div className="space-y-2">
+                                                        {loan.tanggal_pinjam && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Calendar className="w-4 h-4 text-blue-600" />
+                                                                <div>
+                                                                    <p className="text-xs text-blue-600 font-semibold">Pinjam</p>
+                                                                    <p className="text-sm font-bold text-gray-900">
+                                                                        {new Date(loan.tanggal_pinjam).toLocaleDateString('id-ID', {
+                                                                            day: 'numeric',
+                                                                            month: 'short',
+                                                                            year: 'numeric'
+                                                                        })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loan.tanggal_kembali && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Calendar className="w-4 h-4 text-red-600" />
+                                                                <div>
+                                                                    <p className="text-xs text-red-600 font-semibold">Kembali</p>
+                                                                    <p className="text-sm font-bold text-gray-900">
+                                                                        {new Date(loan.tanggal_kembali).toLocaleDateString('id-ID', {
+                                                                            day: 'numeric',
+                                                                            month: 'short',
+                                                                            year: 'numeric'
+                                                                        })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Buttons - Below */}
+                                            {activeTab === "Diproses" && (
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => handleApprove(loan.id)}
+                                                        className="flex-1 px-6 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                                                    >
+                                                        <CheckCircle className="w-5 h-5" />
+                                                        Setujui Peminjaman
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(loan.id)}
+                                                        className="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                                                    >
+                                                        <XCircle className="w-5 h-5" />
+                                                        Tolak Pengajuan
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {activeTab === "Dipinjam" && (
+                                                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl px-6 py-4 font-bold text-center shadow-xl">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <BookOpen className="w-6 h-6" />
+                                                        <span className="text-lg">Sedang Dipinjam</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {activeTab === "Terlambat" && (
+                                                <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl px-6 py-4 font-bold text-center shadow-xl">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <AlertTriangle className="w-6 h-6 animate-pulse" />
+                                                        <span className="text-lg">Terlambat! Segera Kembalikan</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {activeTab === "Dikembalikan" && (
+                                                <div className="bg-gradient-to-br from-gray-500 to-gray-600 text-white rounded-2xl px-6 py-4 font-bold text-center shadow-xl">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <CheckCircle className="w-6 h-6" />
+                                                        <span className="text-lg">Peminjaman Selesai</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

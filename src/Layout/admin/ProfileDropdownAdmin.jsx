@@ -103,7 +103,7 @@ export default function ProfileDropdownAdmin() {
             >
                 <div className="relative">
                     <Image
-                        src={adminData?.avatar || "/admin-avatar.jpg"}
+                        src={adminData?.avatar || "/admin.jpg"}
                         alt={adminData?.name || "Admin"}
                         width={40}
                         height={40}

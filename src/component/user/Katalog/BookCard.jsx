@@ -3,7 +3,27 @@
 import { BookOpen } from "lucide-react";
 
 export default function BookCard({ book }) {
-    const imgSrc = book.img ? `/buku/${book.img}` : "/api/placeholder/200/280";
+    // Handle berbagai format gambar
+    const getImageSrc = () => {
+        if (!book.img) {
+            return "/api/placeholder/200/280";
+        }
+        
+        // Jika sudah URL lengkap (https:// atau http://)
+        if (book.img.startsWith('http://') || book.img.startsWith('https://')) {
+            return book.img;
+        }
+        
+        // Jika path relatif (mulai dengan /)
+        if (book.img.startsWith('/')) {
+            return book.img;
+        }
+        
+        // Jika hanya nama file, tambahkan prefix /buku/
+        return `/buku/${book.img}`;
+    };
+
+    const imgSrc = getImageSrc();
     const kategori = book.kategori || "Tanpa Kategori";
     const stok = book.stok ?? 0;
     const penerbit = book.penerbit || "-";
@@ -15,6 +35,11 @@ export default function BookCard({ book }) {
                     src={imgSrc}
                     alt={book.judul}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                        // Fallback jika gambar error
+                        e.target.src = '/api/placeholder/200/280';
+                        e.target.onerror = null; // Prevent infinite loop
+                    }}
                 />
 
                 {/* Kategori */}
