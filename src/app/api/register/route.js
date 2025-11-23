@@ -1,21 +1,30 @@
 import { db } from "../../../lib/db";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
     try {
         const body = await req.json();
         const { nama, kelas, email, phone, password } = body;
 
+        // Validasi input
+        if (!nama || !kelas || !email || !phone || !password) {
+            return NextResponse.json(
+                { error: "Semua field wajib diisi!" },
+                { status: 400 }
+            );
+        }
+
         // Cek email sudah ada
-        const [cek] = await db.execute(
+        const [rows] = await db.execute(
             "SELECT email FROM users WHERE email = ?",
             [email]
         );
 
-        if (cek.length > 0) {
-            return new Response(
-                JSON.stringify({ error: "Email sudah terdaftar" }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
+        if (rows.length > 0) {
+            return NextResponse.json(
+                { error: "Email sudah terdaftar" },
+                { status: 400 }
             );
         }
 
@@ -28,16 +37,16 @@ export async function POST(req) {
             [nama, kelas, email, phone, hashed]
         );
 
-        return new Response(
-            JSON.stringify({ success: true, message: "Registrasi berhasil!" }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+        return NextResponse.json(
+            { success: true, message: "Registrasi berhasil!" },
+            { status: 201 }
         );
 
     } catch (err) {
-        console.error(err);
-        return new Response(
-            JSON.stringify({ error: "Server error" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+        console.error("Error registrasi:", err);
+        return NextResponse.json(
+            { error: "Terjadi kesalahan server" },
+            { status: 500 }
         );
     }
 }

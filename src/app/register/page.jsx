@@ -13,6 +13,7 @@ export default function Register() {
         password: "",
     });
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,11 +21,14 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMessage("");
+        setIsLoading(true);
 
         const { nama, kelas, email, phone, password } = formData;
 
         if (!nama || !kelas || !email || !phone || !password) {
             setMessage("⚠️ Semua field wajib diisi!");
+            setIsLoading(false);
             return;
         }
 
@@ -39,14 +43,22 @@ export default function Register() {
 
             if (!res.ok) {
                 setMessage(`❌ ${data.error}`);
+                setIsLoading(false);
                 return;
             }
 
-            // Redirect ke halaman login setelah sukses registrasi
-            router.push("/login");
+            // Tampilkan pesan sukses
+            setMessage("✅ Registrasi berhasil! Mengalihkan ke halaman login...");
+            
+            // Redirect ke halaman login setelah 1.5 detik
+            setTimeout(() => {
+                router.push("/login");
+            }, 1500);
+
         } catch (err) {
-            console.error(err);
-            setMessage("Terjadi kesalahan server!");
+            console.error("Error:", err);
+            setMessage("❌ Terjadi kesalahan server!");
+            setIsLoading(false);
         }
     };
 
@@ -60,21 +72,69 @@ export default function Register() {
                     </h2>
 
                     {message && (
-                        <p className="text-center text-sm text-blue-700 font-medium">{message}</p>
+                        <p className={`text-center text-sm font-medium ${
+                            message.includes('✅') ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                            {message}
+                        </p>
                     )}
 
-                    <input type="text" name="nama" value={formData.nama} onChange={handleChange} placeholder="Nama Lengkap" className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm" />
+                    <input
+                        type="text"
+                        name="nama"
+                        value={formData.nama}
+                        onChange={handleChange}
+                        placeholder="Nama Lengkap"
+                        className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm"
+                        disabled={isLoading}
+                    />
 
-                    <input type="text" name="kelas" value={formData.kelas} onChange={handleChange} placeholder="Kelas" className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm" />
+                    <input
+                        type="text"
+                        name="kelas"
+                        value={formData.kelas}
+                        onChange={handleChange}
+                        placeholder="Kelas"
+                        className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm"
+                        disabled={isLoading}
+                    />
 
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm" />
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                        className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm"
+                        disabled={isLoading}
+                    />
 
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Nomor Telepon" className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm" />
+                    <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="Nomor Telepon"
+                        className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm"
+                        disabled={isLoading}
+                    />
 
-                    <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm" />
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Password"
+                        className="w-full p-3 border-2 border-blue-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 text-sm"
+                        disabled={isLoading}
+                    />
 
-                    <button type="submit" className="w-full bg-blue-800 text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-all text-sm">
-                        Register
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full bg-blue-800 text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition-all text-sm disabled:bg-blue-400 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? "Mendaftar..." : "Register"}
                     </button>
 
                     <p className="text-xs text-center text-gray-600 mt-1">

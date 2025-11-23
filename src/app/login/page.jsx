@@ -8,10 +8,12 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError("");
+        setIsLoading(true);
 
         try {
             const res = await fetch("/api/login", {
@@ -24,22 +26,36 @@ export default function Login() {
 
             if (!res.ok) {
                 setError(data.message);
+                setIsLoading(false);
                 return;
             }
 
-            // simpan info user di localStorage
+            // Simpan semua data user ke localStorage
             localStorage.setItem("userId", data.user.id);
             localStorage.setItem("userRole", data.user.role);
+            
+            // Simpan profile data lengkap untuk ProfileDropdown dan Profile Page
+            const profileData = {
+                id: data.user.id,
+                nama: data.user.nama,
+                kelas: data.user.kelas || "-",
+                email: data.user.email,
+                phone: data.user.phone || "-",
+                role: data.user.role
+            };
+            
+            localStorage.setItem("profileData", JSON.stringify(profileData));
 
-            // redirect sesuai role
+            // Redirect sesuai role
             if (data.user.role === "admin") {
                 router.push("/Admin");
             } else {
                 router.push("/user/home");
             }
         } catch (err) {
-            console.error(err);
+            console.error("Error login:", err);
             setError("Terjadi kesalahan, coba lagi!");
+            setIsLoading(false);
         }
     };
 
@@ -90,6 +106,7 @@ export default function Login() {
                                 placeholder="Masukkan Email"
                                 className="w-full p-3 border-2 border-blue-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-sm"
                                 required
+                                disabled={isLoading}
                             />
                         </div>
 
@@ -104,14 +121,16 @@ export default function Login() {
                                 placeholder="Password"
                                 className="w-full p-3 border-2 border-blue-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-900 shadow-sm"
                                 required
+                                disabled={isLoading}
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full bg-blue-800 text-white py-3 rounded-2xl font-semibold hover:bg-blue-900 transition-all shadow-md"
+                            disabled={isLoading}
+                            className="w-full bg-blue-800 text-white py-3 rounded-2xl font-semibold hover:bg-blue-900 transition-all shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed"
                         >
-                            Login
+                            {isLoading ? "Logging in..." : "Login"}
                         </button>
 
                         <p className="text-sm mt-6 text-center text-slate-600">

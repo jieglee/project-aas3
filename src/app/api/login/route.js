@@ -1,32 +1,46 @@
 import { db } from "../../../lib/db";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
     try {
         const { email, password } = await req.json();
 
-        const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
+        // Validasi input
+        if (!email || !password) {
+            return NextResponse.json(
+                { message: "Email dan password harus diisi!" },
+                { status: 400 }
+            );
+        }
+
+        // Cari user berdasarkan email
+        const [rows] = await db.execute(
+            "SELECT * FROM users WHERE email = ?",
+            [email]
+        );
 
         if (rows.length === 0) {
-            return new Response(JSON.stringify({ message: "Email tidak ditemukan!" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+            return NextResponse.json(
+                { message: "Email tidak ditemukan!" },
+                { status: 400 }
+            );
         }
 
         const user = rows[0];
 
-        // cek password
+        // Cek password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return new Response(JSON.stringify({ message: "Password salah!" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+            return NextResponse.json(
+                { message: "Password salah!" },
+                { status: 400 }
+            );
         }
 
-        return new Response(
-            JSON.stringify({
+        // Login berhasil
+        return NextResponse.json(
+            {
                 message: "Login berhasil!",
                 user: {
                     id: user.id,
@@ -34,17 +48,14 @@ export async function POST(req) {
                     email: user.email,
                     role: user.role,
                 },
-            }),
-            {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-            }
+            },
+            { status: 200 }
         );
     } catch (err) {
-        console.error(err);
-        return new Response(JSON.stringify({ message: "Terjadi kesalahan server" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
+        console.error("Error login:", err);
+        return NextResponse.json(
+            { message: "Terjadi kesalahan server" },
+            { status: 500 }
+        );
     }
 }

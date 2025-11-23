@@ -1,11 +1,11 @@
-import db from "../../../../../lib/db";
+import { db } from "../../../../../lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
 export async function GET(req, { params }) {
     try {
         const { id } = params;
-        const [rows] = await db.query(
+        const [rows] = await db.execute(
             "SELECT id, nama, kelas, email, phone, role, created_at FROM users WHERE id = ?", 
             [id]
         );
@@ -16,6 +16,7 @@ export async function GET(req, { params }) {
         
         return NextResponse.json(rows[0]);
     } catch (err) {
+        console.error("Error GET user by id:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
@@ -37,7 +38,7 @@ export async function PUT(req, { params }) {
         }
 
         // Cek apakah email sudah digunakan user lain
-        const [existing] = await db.query(
+        const [existing] = await db.execute(
             "SELECT id FROM users WHERE email = ? AND id != ?", 
             [email, id]
         );
@@ -48,25 +49,36 @@ export async function PUT(req, { params }) {
         // Hash password jika diisi
         let hashed = null;
         if (password && password.trim() !== "") {
-            const salt = await bcrypt.genSalt(10);
-            hashed = await bcrypt.hash(password, salt);
+            hashed = await bcrypt.hash(password, 10);
         }
 
         // Update dengan atau tanpa password
         if (hashed) {
-            await db.query(
+            await db.execute(
                 "UPDATE users SET nama = ?, kelas = ?, email = ?, phone = ?, password = ?, role = ? WHERE id = ?",
                 [nama, kelas, email, phone, hashed, role, id]
             );
         } else {
-            await db.query(
+            await db.execute(
                 "UPDATE users SET nama = ?, kelas = ?, email = ?, phone = ?, role = ? WHERE id = ?",
                 [nama, kelas, email, phone, role, id]
             );
         }
 
-        return NextResponse.json({ message: "User berhasil diupdate" });
+        // Jika user yang diupdate adalah user yang sedang login, update localStorage
+        return NextResponse.json({ 
+            message: "User berhasil diupdate",
+            user: {
+                id: parseInt(id),
+                nama,
+                kelas,
+                email,
+                phone,
+                role
+            }
+        });
     } catch (err) {
+        console.error("Error PUT user:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
@@ -76,14 +88,23 @@ export async function DELETE(req, { params }) {
         const { id } = params;
         
         // Cek apakah user ada
-        const [user] = await db.query("SELECT id FROM users WHERE id = ?", [id]);
+        const [user] = await db.execute("SELECT id, role FROM users WHERE id = ?", [id]);
         if (user.length === 0) {
             return NextResponse.json({ error: "User tidak ditemukan" }, { status: 404 });
         }
 
-        await db.query("DELETE FROM users WHERE id = ?", [id]);
+        // Cegah penghapusan admin terakhir (opsional)
+        if (user[0].role === 'admin') {
+            const [adminCount] = await db.execute("SELECT COUNT(*) as total FROM users WHERE role = 'admin'");
+            if (adminCount[0].total <= 1) {
+                return NextResponse.json({ error: "Tidak dapat menghapus admin terakhir" }, { status: 400 });
+            }
+        }
+
+        await db.execute("DELETE FROM users WHERE id = ?", [id]);
         return NextResponse.json({ message: "User berhasil dihapus" });
     } catch (err) {
+        console.error("Error DELETE user:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

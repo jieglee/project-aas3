@@ -18,9 +18,10 @@ export async function GET(req) {
 
         query += " ORDER BY id DESC";
 
-        const [rows] = await db.query(query, params);
+        const [rows] = await db.execute(query, params);
         return NextResponse.json(rows);
     } catch (err) {
+        console.error("Error GET users:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
@@ -30,8 +31,9 @@ export async function POST(req) {
         const data = await req.json();
         const { nama, kelas = "", email, phone = "", password = "", role = "user" } = data;
 
-        if (!nama || !email) 
+        if (!nama || !email) {
             return NextResponse.json({ error: "Nama & email wajib diisi" }, { status: 400 });
+        }
 
         // Validasi email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,25 +42,25 @@ export async function POST(req) {
         }
 
         // Cek apakah email sudah terdaftar
-        const [existing] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
+        const [existing] = await db.execute("SELECT id FROM users WHERE email = ?", [email]);
         if (existing.length > 0) {
             return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
         }
 
         // Hash password jika ada
-        let hashed = null;
-        if (password) {
-            const salt = await bcrypt.genSalt(10);
-            hashed = await bcrypt.hash(password, salt);
+        let hashed = "";
+        if (password && password.trim() !== "") {
+            hashed = await bcrypt.hash(password, 10);
         }
 
-        await db.query(
+        await db.execute(
             "INSERT INTO users (nama, kelas, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?)",
-            [nama, kelas, email, phone, hashed || "", role]
+            [nama, kelas, email, phone, hashed, role]
         );
 
-        return NextResponse.json({ message: "User berhasil ditambahkan" });
+        return NextResponse.json({ message: "User berhasil ditambahkan" }, { status: 201 });
     } catch (err) {
+        console.error("Error POST user:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

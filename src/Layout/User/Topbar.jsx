@@ -1,4 +1,3 @@
-// TopbarPremium.jsx
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -11,10 +10,16 @@ export default function Topbar({ toggleSidebar, isOpen }) {
   const [book, setBook] = useState(null);
   const [hasAlert, setHasAlert] = useState(false);
 
-  useEffect(() => { if (showNotif) setHasAlert(false); }, [showNotif]);
+  useEffect(() => { 
+    if (showNotif) setHasAlert(false); 
+  }, [showNotif]);
 
   const handleBorrowNotification = () => {
-    setBook({ title: "The Psychology of Money", author: "Morgan Housel", cover: "/psychology.png" });
+    setBook({ 
+      title: "The Psychology of Money", 
+      author: "Morgan Housel", 
+      cover: "/psychology.png" 
+    });
     setShowNotif(true);
     setHasAlert(true);
   };
