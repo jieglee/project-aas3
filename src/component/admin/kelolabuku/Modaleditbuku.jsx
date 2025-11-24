@@ -17,6 +17,7 @@ export default function ModalEditBuku({ book, close, refresh }) {
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [imagePreview, setImagePreview] = useState("");
 
     // Set initial data from book prop
     useEffect(() => {
@@ -31,12 +32,46 @@ export default function ModalEditBuku({ book, close, refresh }) {
                 stok: book.stok || 0,
                 deskripsi: book.deskripsi || ""
             });
+            // Set preview dengan clean URL
+            setImagePreview(cleanImageUrl(book.img));
         }
     }, [book]);
+
+    // Function untuk membersihkan URL yang corrupt
+    const cleanImageUrl = (imgPath) => {
+        if (!imgPath) return "";
+        
+        // Handle corrupt data (ada URL yang digabung)
+        const httpsIndex = imgPath.indexOf('https://');
+        if (httpsIndex > 0) {
+            return imgPath.substring(httpsIndex);
+        }
+        
+        const httpIndex = imgPath.indexOf('http://');
+        if (httpIndex > 0) {
+            return imgPath.substring(httpIndex);
+        }
+        
+        if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+            return imgPath;
+        }
+        
+        if (imgPath.startsWith('/')) {
+            return imgPath;
+        }
+        
+        return `/buku/${imgPath}`;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        
+        // Update preview ketika URL gambar berubah
+        if (name === 'img') {
+            setImagePreview(cleanImageUrl(value));
+        }
+        
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
     };
 
@@ -63,10 +98,16 @@ export default function ModalEditBuku({ book, close, refresh }) {
 
         setLoading(true);
         try {
+            // Bersihkan URL sebelum submit
+            const cleanData = {
+                ...formData,
+                img: cleanImageUrl(formData.img)
+            };
+
             const res = await fetch(`/api/buku/${book.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(cleanData)
             });
 
             const data = await res.json();
@@ -117,19 +158,30 @@ export default function ModalEditBuku({ book, close, refresh }) {
                         <div className="md:col-span-1">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Cover Buku</label>
                             <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 rounded-xl border-2 border-dashed border-yellow-300 overflow-hidden group hover:border-yellow-500 transition-all">
-                                {formData.img ? (
-                                    <img 
-                                        src={formData.img} 
-                                        alt="Cover" 
-                                        className="w-full h-full object-cover" 
-                                        onError={(e)=>{
-                                            e.target.src='/api/placeholder/300/400';
-                                        }}
-                                    />
+                                {imagePreview ? (
+                                    <>
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Cover Preview" 
+                                            className="w-full h-full object-cover" 
+                                            onError={(e)=>{
+                                                console.error("❌ Image failed to load:", imagePreview);
+                                                e.target.onerror = null;
+                                                e.target.src='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400"%3E%3Crect fill="%23e5e7eb" width="300" height="400"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%239ca3af" font-size="14"%3EImage Error%3C/text%3E%3C/svg%3E';
+                                            }}
+                                            onLoad={() => {
+                                                console.log("✅ Image loaded successfully:", imagePreview);
+                                            }}
+                                        />
+                                        {/* Overlay untuk validasi */}
+                                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-lg shadow-md">
+                                            ✓ Valid
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-yellow-400 text-xs">
                                         <Upload size={30} className="mb-1" />
-                                        Preview
+                                        <p className="text-center px-2">Masukkan URL gambar</p>
                                     </div>
                                 )}
                             </div>
@@ -138,9 +190,12 @@ export default function ModalEditBuku({ book, close, refresh }) {
                                 name="img"
                                 value={formData.img}
                                 onChange={handleChange}
-                                placeholder="URL cover"
-                                className="w-full mt-2 pl-8 pr-2 py-1.5 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
+                                placeholder="https://example.com/image.jpg"
+                                className="w-full mt-2 px-3 py-2 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
                             />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Paste URL gambar dari internet
+                            </p>
                         </div>
 
                         {/* Fields */}

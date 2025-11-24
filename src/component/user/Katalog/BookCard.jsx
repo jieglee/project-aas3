@@ -3,10 +3,23 @@
 import { BookOpen } from "lucide-react";
 
 export default function BookCard({ book }) {
-    // Handle berbagai format gambar
+    // PERBAIKAN: Satu function untuk handle semua format image URL
     const getImageSrc = () => {
         if (!book.img) {
             return "/api/placeholder/200/280";
+        }
+        
+        // Handle corrupt data (ada URL yang digabung)
+        const httpsIndex = book.img.indexOf('https://');
+        if (httpsIndex > 0) {
+            console.log("🔧 Fixed corrupt URL in BookCard:", book.img);
+            return book.img.substring(httpsIndex);
+        }
+        
+        const httpIndex = book.img.indexOf('http://');
+        if (httpIndex > 0) {
+            console.log("🔧 Fixed corrupt URL in BookCard:", book.img);
+            return book.img.substring(httpIndex);
         }
         
         // Jika sudah URL lengkap (https:// atau http://)
@@ -31,24 +44,30 @@ export default function BookCard({ book }) {
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100">
             <div className="relative w-full h-64 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
+                {/* PERBAIKAN: Gunakan imgSrc yang sudah di-clean */}
                 <img 
-                src={
-                    book.img?.startsWith('http') 
-                        ? book.img  // URL eksternal langsung
-                        : `/images/books/${book.img}`  // File lokal pakai path
-                } 
-                alt={book.judul} 
+                    src={imgSrc}
+                    alt={book.judul || "Book Cover"}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                        console.error("❌ BookCard image failed to load:", imgSrc);
+                        e.target.onerror = null;
+                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="280"%3E%3Crect fill="%23e5e7eb" width="200" height="280"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%239ca3af" font-size="14"%3ENo Image%3C/text%3E%3C/svg%3E';
+                    }}
+                    onLoad={() => {
+                        console.log("✅ BookCard image loaded:", book.judul);
+                    }}
                 />
 
-                {/* Kategori */}
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-blue-900">
+                {/* Kategori Badge */}
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-blue-900 shadow-md">
                     {kategori}
                 </div>
 
-                {/* Stok Habis */}
+                {/* Stok Habis Overlay */}
                 {stok === 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                        <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
                             Stok Habis
                         </span>
                     </div>

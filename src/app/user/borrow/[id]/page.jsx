@@ -14,6 +14,7 @@ import {
     Clock,
     AlertCircle
 } from "lucide-react";
+import ModalWaitingAdmin from "../../../../component/user/Borrow/ModalWaitingAdmin";
 
 export default function BookDetailPage() {
     const params = useParams();
@@ -25,6 +26,9 @@ export default function BookDetailPage() {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [borrowDate, setBorrowDate] = useState(null);
     const [returnDate, setReturnDate] = useState(null);
+
+    // Modal state
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         async function fetchBook() {
@@ -77,8 +81,8 @@ export default function BookDetailPage() {
             });
 
             if (res.ok) {
-                alert("Peminjaman berhasil diajukan! Menunggu konfirmasi admin.");
-                router.push("/dashboard/user");
+                // Tampilkan modal sukses
+                setShowModal(true);
             } else {
                 const text = await res.text();
                 alert(`Gagal mengajukan peminjaman: ${text}`);
@@ -425,6 +429,16 @@ export default function BookDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Modal Waiting Admin */}
+            <ModalWaitingAdmin
+                show={showModal}
+                onClose={() => setShowModal(false)}
+                book={book}
+                borrowDate={borrowDate}
+                returnDate={returnDate}
+                fine={0}
+            />
         </div>
     );
 }

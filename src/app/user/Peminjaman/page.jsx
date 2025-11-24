@@ -19,10 +19,14 @@ export default function PeminjamanBuku() {
     ];
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            setUserId(user.id);
+        // PERBAIKAN: Ambil userId langsung dari localStorage (konsisten dengan BookDetailPage)
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+            setUserId(parseInt(storedUserId));
+            console.log("✅ User ID found:", storedUserId);
+        } else {
+            console.log("❌ No userId in localStorage");
+            console.log("Available keys:", Object.keys(localStorage));
         }
     }, []);
 
@@ -39,6 +43,7 @@ export default function PeminjamanBuku() {
     const fetchPeminjaman = async () => {
         try {
             setLoading(true);
+            console.log("📡 Fetching peminjaman for user:", userId);
             const response = await fetch(`/api/peminjaman?user_id=${userId}`);
             
             if (!response.ok) {
@@ -50,7 +55,7 @@ export default function PeminjamanBuku() {
 
             setPeminjaman(data);
         } catch (error) {
-            console.error('Error fetching peminjaman:', error);
+            console.error('❌ Error fetching peminjaman:', error);
         } finally {
             setLoading(false);
         }
@@ -81,13 +86,31 @@ export default function PeminjamanBuku() {
         return badges[status] || 'bg-gray-100 text-gray-700';
     };
 
-    // PERBAIKAN: Helper untuk handle URL gambar
+    // Helper untuk handle URL gambar
     const getImageSrc = (imgPath) => {
         console.log("🖼️ Processing image:", imgPath);
         
         if (!imgPath) {
             console.log("❌ No image path");
             return null;
+        }
+        
+        // PERBAIKAN: Handle corrupt data (ada URL yang digabung)
+        // Cek jika ada https:// di tengah string (bukan di awal)
+        const httpsIndex = imgPath.indexOf('https://');
+        if (httpsIndex > 0) {
+            // Ambil URL yang valid (yang ada https://)
+            const cleanUrl = imgPath.substring(httpsIndex);
+            console.log("🔧 Fixed corrupt URL:", cleanUrl);
+            return cleanUrl;
+        }
+        
+        // Cek jika ada http:// di tengah string (bukan di awal)
+        const httpIndex = imgPath.indexOf('http://');
+        if (httpIndex > 0) {
+            const cleanUrl = imgPath.substring(httpIndex);
+            console.log("🔧 Fixed corrupt URL:", cleanUrl);
+            return cleanUrl;
         }
         
         // Jika sudah URL lengkap (http:// atau https://)
@@ -102,8 +125,8 @@ export default function PeminjamanBuku() {
             return imgPath;
         }
         
-        // Jika hanya nama file, tambahkan prefix
-        const fullPath = `/images/books/${imgPath}`;
+        // Jika hanya nama file, tambahkan prefix (sesuaikan dengan struktur folder Anda)
+        const fullPath = `/buku/${imgPath}`;
         console.log("⚠️ Filename only, using:", fullPath);
         return fullPath;
     };
@@ -114,7 +137,17 @@ export default function PeminjamanBuku() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-gray-600">Silakan login terlebih dahulu</p>
+                    <div className="mb-4">
+                        <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 text-lg font-medium">Silakan login terlebih dahulu</p>
+                        <p className="text-gray-500 text-sm mt-2">Anda perlu login untuk melihat peminjaman</p>
+                    </div>
+                    <button
+                        onClick={() => window.location.href = '/login'}
+                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        Login Sekarang
+                    </button>
                 </div>
             </div>
         );
@@ -201,7 +234,7 @@ export default function PeminjamanBuku() {
                                 <div key={item.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                                     <div className="p-6">
                                         <div className="flex gap-6">
-                                            {/* Book Image - PERBAIKAN */}
+                                            {/* Book Image */}
                                             <div className="flex-shrink-0">
                                                 <img
                                                     src={imageSrc || fallbackSVG}
