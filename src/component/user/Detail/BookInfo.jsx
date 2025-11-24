@@ -1,48 +1,53 @@
 "use client";
 
 export default function BookInfo({ book }) {
-    if (!book) return <p>Loading...</p>;
-
     return (
-        <div className="space-y-6 flex-1">
-            
+        <div className="space-y-4">
             <div>
-                <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold mb-3">
-                    {book.kategori || "Umum"}
-                </span>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    {book.judul}
+                    {book?.judul || "Judul Tidak Tersedia"}
                 </h1>
-                <p className="text-gray-600 text-base">
-                    oleh <span className="font-semibold">{book.penulis}</span>
+                <p className="text-lg text-gray-600">
+                    oleh <span className="font-medium text-gray-800">{book?.penulis || "-"}</span>
                 </p>
             </div>
 
-            <div className="border-t pt-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Deskripsi</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                    {book.deskripsi || "Tidak ada deskripsi tersedia."}
-                </p>
+            <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {book?.kategori || "Uncategorized"}
+                </span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    book?.stok > 0 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                }`}>
+                    {book?.stok > 0 ? 'Tersedia' : 'Habis'}
+                </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Penerbit</p>
-                    <p className="text-sm font-semibold text-gray-900">{book.penerbit}</p>
+            <div className="border-t border-gray-200 pt-4 space-y-3">
+                <div className="flex justify-between">
+                    <span className="text-gray-600">Penerbit</span>
+                    <span className="font-medium text-gray-900">{book?.penerbit || "-"}</span>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Tahun Terbit</p>
-                    <p className="text-sm font-semibold text-gray-900">{book.tahun_terbit}</p>
+                <div className="flex justify-between">
+                    <span className="text-gray-600">Tahun Terbit</span>
+                    <span className="font-medium text-gray-900">{book?.tahun_terbit || "-"}</span>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Stok</p>
-                    <p className="text-sm font-semibold text-gray-900">{book.stok} buku</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Kategori</p>
-                    <p className="text-sm font-semibold text-gray-900">{book.kategori}</p>
+                <div className="flex justify-between">
+                    <span className="text-gray-600">Stok Tersedia</span>
+                    <span className="font-bold text-blue-600">{book?.stok || 0} Buku</span>
                 </div>
             </div>
+
+            {book?.deskripsi && (
+                <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Deskripsi</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                        {book.deskripsi}
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

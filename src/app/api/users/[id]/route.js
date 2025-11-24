@@ -1,10 +1,12 @@
-import { db } from "../../../../../lib/db";
+import { db } from "../../../../lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
 export async function GET(req, { params }) {
     try {
-        const { id } = params;
+        // PERBAIKAN: await params
+        const { id } = await params;
+        
         const [rows] = await db.execute(
             "SELECT id, nama, kelas, email, phone, role, created_at FROM users WHERE id = ?", 
             [id]
@@ -15,85 +17,112 @@ export async function GET(req, { params }) {
         }
         
         return NextResponse.json(rows[0]);
-    } catch (err) {
-        console.error("Error GET user by id:", err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+    } catch (error) {
+        console.error("🔥 ERROR GET USER:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
 export async function PUT(req, { params }) {
     try {
-        const { id } = params;
+        // PERBAIKAN: await params
+        const { id } = await params;
         const body = await req.json();
-        const { nama, kelas = "", email, phone = "", password, role = "user" } = body;
+        
+        console.log("=== RECEIVED UPDATE DATA ===");
+        console.log("User ID:", id);
+        console.log("Raw body:", body);
+        
+        // Clean dan validasi
+        const cleanNama = (body.nama && typeof body.nama === 'string') ? body.nama.trim() : '';
+        const cleanKelas = (body.kelas && typeof body.kelas === 'string') ? body.kelas.trim() : '';
+        const cleanEmail = (body.email && typeof body.email === 'string') ? body.email.trim() : '';
+        const cleanPhone = (body.phone && typeof body.phone === 'string') ? body.phone.trim() : '';
+        const cleanPassword = (body.password && typeof body.password === 'string') ? body.password.trim() : '';
+        const cleanRole = (body.role === 'admin' || body.role === 'user') ? body.role : 'user';
 
-        if (!nama || !email) {
-            return NextResponse.json({ error: "Nama & email wajib diisi" }, { status: 400 });
+        // Validasi
+        if (!cleanNama) {
+            return NextResponse.json({ error: "Nama wajib diisi" }, { status: 400 });
         }
 
-        // Validasi email format
+        if (!cleanEmail) {
+            return NextResponse.json({ error: "Email wajib diisi" }, { status: 400 });
+        }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(cleanEmail)) {
             return NextResponse.json({ error: "Format email tidak valid" }, { status: 400 });
         }
 
-        // Cek apakah email sudah digunakan user lain
+        // Cek email duplikat
         const [existing] = await db.execute(
             "SELECT id FROM users WHERE email = ? AND id != ?", 
-            [email, id]
+            [cleanEmail, id]
         );
         if (existing.length > 0) {
             return NextResponse.json({ error: "Email sudah digunakan oleh user lain" }, { status: 400 });
         }
 
-        // Hash password jika diisi
-        let hashed = null;
-        if (password && password.trim() !== "") {
-            hashed = await bcrypt.hash(password, 10);
-        }
+        // Prepare values - PASTIKAN tidak ada undefined
+        const finalNama = cleanNama;
+        const finalKelas = cleanKelas || null;
+        const finalEmail = cleanEmail;
+        const finalPhone = cleanPhone || null;
+        const finalRole = cleanRole;
 
-        // Update dengan atau tanpa password
-        if (hashed) {
+        console.log("=== FINAL VALUES ===");
+        console.log({ finalNama, finalKelas, finalEmail, finalPhone, finalRole });
+
+        // Update
+        if (cleanPassword && cleanPassword.length > 0) {
+            if (cleanPassword.length < 6) {
+                return NextResponse.json({ error: "Password minimal 6 karakter" }, { status: 400 });
+            }
+
+            const hashed = await bcrypt.hash(cleanPassword, 10);
+            
             await db.execute(
                 "UPDATE users SET nama = ?, kelas = ?, email = ?, phone = ?, password = ?, role = ? WHERE id = ?",
-                [nama, kelas, email, phone, hashed, role, id]
+                [finalNama, finalKelas, finalEmail, finalPhone, hashed, finalRole, id]
             );
+            console.log("✅ UPDATE SUCCESS (with password)");
         } else {
             await db.execute(
                 "UPDATE users SET nama = ?, kelas = ?, email = ?, phone = ?, role = ? WHERE id = ?",
-                [nama, kelas, email, phone, role, id]
+                [finalNama, finalKelas, finalEmail, finalPhone, finalRole, id]
             );
+            console.log("✅ UPDATE SUCCESS (without password)");
         }
 
-        // Jika user yang diupdate adalah user yang sedang login, update localStorage
         return NextResponse.json({ 
             message: "User berhasil diupdate",
             user: {
                 id: parseInt(id),
-                nama,
-                kelas,
-                email,
-                phone,
-                role
+                nama: finalNama,
+                kelas: finalKelas,
+                email: finalEmail,
+                phone: finalPhone,
+                role: finalRole
             }
         });
     } catch (err) {
-        console.error("Error PUT user:", err);
+        console.error("=== ERROR PUT USER ===");
+        console.error(err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
 
 export async function DELETE(req, { params }) {
     try {
-        const { id } = params;
+        // PERBAIKAN: await params
+        const { id } = await params;
         
-        // Cek apakah user ada
         const [user] = await db.execute("SELECT id, role FROM users WHERE id = ?", [id]);
         if (user.length === 0) {
             return NextResponse.json({ error: "User tidak ditemukan" }, { status: 404 });
         }
 
-        // Cegah penghapusan admin terakhir (opsional)
         if (user[0].role === 'admin') {
             const [adminCount] = await db.execute("SELECT COUNT(*) as total FROM users WHERE role = 'admin'");
             if (adminCount[0].total <= 1) {

@@ -31,15 +31,13 @@ export default function BookCard({ book }) {
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100">
             <div className="relative w-full h-64 bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden">
-                <img
-                    src={imgSrc}
-                    alt={book.judul}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                        // Fallback jika gambar error
-                        e.target.src = '/api/placeholder/200/280';
-                        e.target.onerror = null; // Prevent infinite loop
-                    }}
+                <img 
+                src={
+                    book.img?.startsWith('http') 
+                        ? book.img  // URL eksternal langsung
+                        : `/images/books/${book.img}`  // File lokal pakai path
+                } 
+                alt={book.judul} 
                 />
 
                 {/* Kategori */}

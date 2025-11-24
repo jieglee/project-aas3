@@ -20,7 +20,7 @@ export default function SearchBar({ onSearch }) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Cari user..."
-                className="w-full border border-gray-300 px-10 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border text-gray-700 px-10 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
         </div>
     );

@@ -32,64 +32,73 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
     try {
-        const { id } = params;
+        const { id } = await params; // TAMBAHKAN await
         const body = await req.json();
         const { status, denda_dibayar } = body;
 
-        // Jika status diubah menjadi "Dipinjam", kurangi stok buku
-        if (status === "Dipinjam") {
-            const [peminjaman] = await db.execute(
-                "SELECT buku_id FROM peminjaman WHERE id = ?",
-                [id]
-            );
+        console.log("=== UPDATE PEMINJAMAN ===");
+        console.log("ID:", id);
+        console.log("New Status:", status);
 
-            if (peminjaman.length > 0) {
-                await db.execute(
-                    "UPDATE buku SET stok = stok - 1 WHERE id = ? AND stok > 0",
-                    [peminjaman[0].buku_id]
-                );
-            }
+        // Ambil data peminjaman lama
+        const [oldData] = await db.execute(
+            "SELECT buku_id, status FROM peminjaman WHERE id = ?",
+            [id]
+        );
+
+        if (oldData.length === 0) {
+            return NextResponse.json(
+                { error: "Peminjaman tidak ditemukan" },
+                { status: 404 }
+            );
         }
 
-        // Jika status diubah menjadi "Dikembalikan", tambah stok buku
-        if (status === "Dikembalikan") {
-            const [peminjaman] = await db.execute(
-                "SELECT buku_id FROM peminjaman WHERE id = ?",
-                [id]
-            );
+        const oldStatus = oldData[0].status;
+        const buku_id = oldData[0].buku_id;
 
-            if (peminjaman.length > 0) {
-                await db.execute(
-                    "UPDATE buku SET stok = stok + 1 WHERE id = ?",
-                    [peminjaman[0].buku_id]
-                );
-            }
+        // Jika status berubah dari "Menunggu" ke "Dipinjam", kurangi stok
+        if (oldStatus !== "Dipinjam" && status === "Dipinjam") {
+            await db.execute(
+                "UPDATE buku SET stok = stok - 1 WHERE id = ? AND stok > 0",
+                [buku_id]
+            );
+            console.log("✅ Stok dikurangi (status: Menunggu → Dipinjam)");
+        }
+
+        // Jika status berubah ke "Dikembalikan", tambah stok
+        if (oldStatus !== "Dikembalikan" && status === "Dikembalikan") {
+            await db.execute(
+                "UPDATE buku SET stok = stok + 1 WHERE id = ?",
+                [buku_id]
+            );
+            console.log("✅ Stok ditambah (status → Dikembalikan)");
         }
 
         // Update status peminjaman
         let query = "UPDATE peminjaman SET status = ?";
-        let params = [status];
+        let queryParams = [status];
 
         if (denda_dibayar !== undefined) {
             query += ", denda_dibayar = ?";
-            params.push(denda_dibayar);
+            queryParams.push(denda_dibayar);
         }
 
         query += " WHERE id = ?";
-        params.push(id);
+        queryParams.push(id);
 
-        await db.execute(query, params);
+        await db.execute(query, queryParams);
 
         return NextResponse.json({ message: "Status peminjaman berhasil diupdate" });
     } catch (err) {
-        console.error("Error PUT peminjaman:", err);
+        console.error("=== ERROR UPDATE PEMINJAMAN ===");
+        console.error(err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
 
 export async function DELETE(req, { params }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         
         // Cek apakah peminjaman ada
         const [peminjaman] = await db.execute(
@@ -108,3 +117,4 @@ export async function DELETE(req, { params }) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

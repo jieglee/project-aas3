@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import Badge from "../../ui/Badge";
 import ModalEditBuku from "../../../component/admin/kelolabuku/Modaleditbuku";
+import BookImage from "./BookImage";
 
 export default function TabelBuku({ books, reload }) {
     const [editingBook, setEditingBook] = useState(null);
@@ -69,6 +70,11 @@ export default function TabelBuku({ books, reload }) {
                             {books.map((buku, i) => {
                                 const stokColor =
                                     buku.stok > 5 ? "success" : buku.stok > 0 ? "yellow" : "error";
+                                    if (!buku.img || buku.img === '') {
+                                        console.log(`⚠️ Buku "${buku.judul}" tidak punya gambar`);
+                                    } else {
+                                        console.log(`📷 ${buku.judul}: ${buku.img}`);
+                                    }
 
                                 return (
                                     <tr
@@ -78,12 +84,14 @@ export default function TabelBuku({ books, reload }) {
                                         {/* Gambar */}
                                         <td className="px-6 py-4">
                                             {buku.img ? (
-                                                <img
+                                                <BookImage
                                                     src={buku.img}
                                                     alt={buku.judul}
                                                     className="w-14 h-20 object-cover rounded-lg shadow-sm"
                                                     onError={(e) => {
-                                                        e.target.src = '/api/placeholder/56/80';
+                                                        // Ganti dengan placeholder yang valid
+                                                        e.target.onerror = null; // Prevent infinite loop
+                                                        e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="80" viewBox="0 0 56 80"><rect fill="%23e5e7eb" width="56" height="80"/><text x="50%" y="50%" text-anchor="middle" fill="%239ca3af" font-family="sans-serif" font-size="10" dy=".3em">No Image</text></svg>';
                                                     }}
                                                 />
                                             ) : (

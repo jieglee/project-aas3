@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { X, User, Mail, Phone, Lock, School } from "lucide-react";
+import { X, User, Mail, Phone, Lock, School, Shield } from "lucide-react";
 
 export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
     const [form, setForm] = useState({
@@ -9,25 +9,34 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
         email: "",
         phone: "",
         password: "",
+        role: "user"
     });
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (editData) {
-            setForm({ ...editData, password: "" }); // password kosong saat edit
-        } else {
-            setForm({
-                nama: "",
-                kelas: "",
-                email: "",
-                phone: "",
-                password: "",
-            });
-        }
-        setErrors({});
-    }, [editData, isOpen]);
+   useEffect(() => {
+    if (editData) {
+        setForm({ 
+            nama: editData.nama || "",
+            kelas: editData.kelas || "",
+            email: editData.email || "",
+            phone: editData.phone || "",
+            password: "",  // Selalu kosong saat edit
+            role: editData.role || "user"
+        });
+    } else {
+        setForm({
+            nama: "",
+            kelas: "",
+            email: "",
+            phone: "",
+            password: "",
+            role: "user"
+        });
+    }
+    setErrors({});
+}, [editData, isOpen]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -46,35 +55,58 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
-        const method = editData ? "PUT" : "POST";
-        const url = editData ? `/api/users/${editData.id}` : "/api/users";
+    const method = editData ? "PUT" : "POST";
+    const url = editData ? `/api/users/${editData.id}` : "/api/users";
 
-        setLoading(true);
-        try {
-            const res = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert(data.message || "User berhasil disimpan!");
-                fetchUsers();
-                handleClose();
-            } else {
-                alert(data.error || "Terjadi kesalahan");
-            }
-        } catch (err) {
-            alert("Terjadi kesalahan saat menyimpan user");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+    // Buat payload yang bersih
+    const payload = {
+        nama: form.nama || "",
+        kelas: form.kelas || "",
+        email: form.email || "",
+        phone: form.phone || "",
+        role: form.role || "user"
     };
+
+    // Tambahkan password hanya jika diisi
+    if (form.password && form.password !== "") {
+        payload.password = form.password;
+    }
+
+    // Remove empty strings dan set to empty string (bukan undefined)
+    Object.keys(payload).forEach(key => {
+        if (payload[key] === undefined || payload[key] === null) {
+            payload[key] = "";
+        }
+    });
+
+    console.log("Sending payload:", payload); // Debug log
+
+    setLoading(true);
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(data.message || "User berhasil disimpan!");
+            fetchUsers();
+            handleClose();
+        } else {
+            alert(data.error || "Terjadi kesalahan");
+        }
+    } catch (err) {
+        alert("Terjadi kesalahan saat menyimpan user");
+        console.error(err);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleClose = () => {
         setForm({
@@ -83,6 +115,7 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
             email: "",
             phone: "",
             password: "",
+            role: "user"
         });
         setErrors({});
         onClose();
@@ -156,7 +189,7 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
                                 placeholder="Contoh: XII IPA 1"
                                 value={form.kelas}
                                 onChange={(e) => setForm({ ...form, kelas: e.target.value })}
-                                className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                className="w-full pl-11 text-gray-800 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -197,6 +230,26 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
                                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                 className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                             />
+                        </div>
+                    </div>
+
+                    {/* Role */}
+                    <div className="group">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Role <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <div className="absolute left-3 top-3.5 text-gray-400 group-focus-within:text-blue-600 transition-colors">
+                                <Shield className="w-5 h-5" />
+                            </div>
+                            <select
+                                value={form.role}
+                                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                                className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 focus:border-blue-500 rounded-xl focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none bg-white cursor-pointer"
+                            >
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                     </div>
 
@@ -245,7 +298,10 @@ export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
                         className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {loading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <>
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Menyimpan...
+                            </>
                         ) : (
                             "Simpan"
                         )}

@@ -289,84 +289,83 @@ export default function AdminDashboard() {
                 />
             </div>
 
-            {/* Users Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-900">Daftar Users PERPUSTB</h2>
-                </div>
-                
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">NIPD</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Nama</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Role</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Created At</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {users.map((user, index) => (
-                                <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">{user.id}</td>
-                                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.nama}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                                    <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                            user
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {new Date(user.created_at).toLocaleDateString('id-ID', {
-                                            day: '2-digit',
-                                            month: 'short',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => window.location.href = `/admin/users/${user.id}`}
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Lihat Detail"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => window.location.href = `/admin/users/edit/${user.id}`}
-                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                title="Edit"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user.id)}
-                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Hapus"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+           {/* Users Table */}
+<div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+    <div className="p-6 border-b border-gray-200">
+        <h2 className="text-xl font-bold text-gray-900">Daftar Users PERPUSTB</h2>
+    </div>
+    
+    <div className="overflow-x-auto">
+        <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Nama</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Role</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Phone</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Created At</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+                {users.map((user, index) => (
+                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 text-sm text-gray-900">{user.id}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.nama}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                        <td className="px-6 py-4">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                {user.role}
+                            </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{user.phone || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                            {new Date(user.created_at).toLocaleDateString('id-ID', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </td>
+                        <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => window.location.href = `/admin/users/${user.id}`}
+                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Lihat Detail"
+                                >
+                                    <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => window.location.href = `/admin/users/edit/${user.id}`}
+                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                    title="Edit"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(user.id)}
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Hapus"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
 
-                {users.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-gray-500">Belum ada data user</p>
-                    </div>
-                )}
-            </div>
-
+    {users.length === 0 && (
+        <div className="text-center py-12">
+            <p className="text-gray-500">Belum ada data user</p>
+        </div>
+    )}
+</div>
             {/* Statistics Chart */}
             <StatisticsChart />
         </div>

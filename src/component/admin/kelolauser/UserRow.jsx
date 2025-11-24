@@ -19,7 +19,7 @@ export default function UserRow({ user, fetchUsers, zebra, onEdit }) {
             <td className="px-4 py-3 text-gray-800 font-semibold">{user.nama}</td>
             <td className="px-4 py-3 text-gray-700">{user.kelas}</td>
             <td className="px-4 py-3 text-blue-600">{user.email}</td>
-            <td className="px-4 py-3 text-center">{user.phone}</td>
+            <td className="px-4 py-3 text-gray-700 text-center">{user.phone}</td>
             <td className="px-4 py-3 text-center">
                 <span
                     className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${user.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
