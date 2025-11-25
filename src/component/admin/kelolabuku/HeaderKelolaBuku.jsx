@@ -1,7 +1,7 @@
 "use client";
 
 import { BookOpen, Plus } from "lucide-react";
-import SearchBuku from "../../../component/admin/kelolabuku/SearchBuku";
+import SearchBuku from "./SearchBuku";
 
 export default function KelolaBukuHeader({ query, setQuery, onAdd }) {
     return (

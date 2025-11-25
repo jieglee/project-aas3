@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import Badge from "../../ui/Badge";
-import ModalEditBuku from "../../../component/admin/kelolabuku/Modaleditbuku";
+import ModalEditBuku from "./Modaleditbuku";
 import BookImage from "./BookImage";
 
 export default function TabelBuku({ books, reload }) {
