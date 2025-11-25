@@ -12,7 +12,6 @@ export default function SidebarAdmin({ isOpen }) {
     { name: "Kelola Users", icon: <Users size={20} />, path: "/Admin/KelolaUser" },
     { name: "Kelola Buku", icon: <Book size={20} />, path: "/Admin/KelolaBuku" },
     { name: "Peminjaman", icon: <ClipboardList size={20} />, path: "/Admin/AdminTable" },
-    { name: "Laporan", icon: <FileText size={20} />, path: "/Admin/Reports" },
   ];
 
   return (

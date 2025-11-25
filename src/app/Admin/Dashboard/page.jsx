@@ -1,44 +1,50 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, UserCheck, BookOpen, Library, Eye, Edit, Trash2 } from "lucide-react";
+import { Users, UserCheck, BookOpen, Library, Eye, Edit, Trash2, TrendingUp, Calendar, Clock } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-// Stats Card Component
-function StatsCard({ icon, label, value, color }) {
+// Stats Card Component - COMPACT
+function StatsCard({ icon, label, value, color, trend }) {
     const colorClasses = {
-        blue: "bg-blue-500",
-        green: "bg-green-500",
-        purple: "bg-purple-500",
-        orange: "bg-orange-500"
+        blue: "from-blue-500 to-blue-600",
+        green: "from-green-500 to-green-600",
+        purple: "from-purple-500 to-purple-600",
+        orange: "from-orange-500 to-orange-600"
     };
 
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-start justify-between mb-4">
-                <div>
-                    <p className="text-gray-600 text-sm font-medium mb-2">{label}</p>
-                    <h3 className="text-4xl font-bold text-gray-900">{value}</h3>
-                </div>
-                <div className={`${colorClasses[color]} p-4 rounded-2xl`}>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-3">
+                <div className={`w-10 h-10 bg-gradient-to-br ${colorClasses[color]} rounded-lg flex items-center justify-center shadow-sm`}>
                     {icon}
                 </div>
+                {trend && (
+                    <div className="flex items-center gap-1 text-green-600 bg-green-50 px-1.5 py-0.5 rounded text-xs font-semibold">
+                        <TrendingUp className="w-2.5 h-2.5" />
+                        <span>{trend}</span>
+                    </div>
+                )}
+            </div>
+            <div>
+                <p className="text-gray-500 text-xs font-medium mb-0.5">{label}</p>
+                <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
             </div>
         </div>
     );
 }
 
-// Chart Tab Component
+// Chart Tab Component - COMPACT
 function ChartTab({ active, setActive }) {
     return (
-        <div className="inline-flex bg-gray-100 rounded-lg p-1">
+        <div className="inline-flex bg-gray-100 rounded-full p-0.5">
             <button
                 onClick={() => setActive("weekly")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                     active === "weekly"
-                        ? "bg-white text-blue-600 shadow-sm"
+                        ? "bg-blue-600 text-white shadow-sm"
                         : "text-gray-600 hover:text-gray-900"
                 }`}
             >
@@ -46,9 +52,9 @@ function ChartTab({ active, setActive }) {
             </button>
             <button
                 onClick={() => setActive("monthly")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                     active === "monthly"
-                        ? "bg-white text-blue-600 shadow-sm"
+                        ? "bg-blue-600 text-white shadow-sm"
                         : "text-gray-600 hover:text-gray-900"
                 }`}
             >
@@ -58,45 +64,43 @@ function ChartTab({ active, setActive }) {
     );
 }
 
-// Statistics Chart Component
+// Statistics Chart Component - COMPACT
 function StatisticsChart() {
     const [activeTab, setActiveTab] = useState("weekly");
 
     const options = {
         legend: { show: false },
-        colors: ["#3B82F6"],
+        colors: ["#3b82f6"],
         chart: {
             fontFamily: "Inter, sans-serif",
-            height: 310,
+            height: 240,
             type: "area",
             toolbar: { show: false },
         },
-        stroke: { curve: "smooth", width: 3 },
+        stroke: { curve: "smooth", width: 2 },
         fill: {
             type: "gradient",
             gradient: {
                 shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.1,
+                opacityFrom: 0.35,
+                opacityTo: 0.05,
             },
         },
-        markers: { size: 0, hover: { size: 5 } },
+        markers: { size: 0, hover: { size: 4 } },
         grid: {
-            borderColor: "#f1f1f1",
+            borderColor: "#f1f5f9",
+            padding: { top: 10, right: 10, bottom: 0, left: 5 },
             yaxis: { lines: { show: true } },
             xaxis: { lines: { show: false } }
         },
         dataLabels: { enabled: false },
         tooltip: {
             enabled: true,
-            y: {
-                formatter: (val) => val + " peminjaman"
-            }
+            style: { fontSize: "11px" },
+            y: { formatter: (val) => val + " peminjaman" }
         },
         yaxis: {
-            labels: {
-                style: { fontSize: "12px", colors: ["#64748b"] }
-            }
+            labels: { style: { fontSize: "10px", colors: ["#64748b"], fontWeight: 500 } }
         },
     };
 
@@ -106,13 +110,11 @@ function StatisticsChart() {
             categories: ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
             axisBorder: { show: false },
             axisTicks: { show: false },
-            labels: { style: { colors: "#64748b", fontSize: "12px" } }
+            labels: { style: { colors: "#64748b", fontSize: "10px", fontWeight: 500 } }
         },
     };
 
-    const weeklySeries = [
-        { name: "Peminjaman", data: [12, 15, 18, 13, 20, 17, 22] },
-    ];
+    const weeklySeries = [{ name: "Peminjaman", data: [12, 15, 18, 13, 20, 17, 22] }];
 
     const monthlyOptions = {
         ...options,
@@ -120,13 +122,11 @@ function StatisticsChart() {
             categories: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
             axisBorder: { show: false },
             axisTicks: { show: false },
-            labels: { style: { colors: "#64748b", fontSize: "12px" } }
+            labels: { style: { colors: "#64748b", fontSize: "10px", fontWeight: 500 }, rotate: -45 }
         },
     };
 
-    const monthlySeries = [
-        { name: "Peminjaman", data: [140, 110, 120, 180, 200, 190, 210, 250, 240, 260, 280, 300] },
-    ];
+    const monthlySeries = [{ name: "Peminjaman", data: [140, 110, 120, 180, 200, 190, 210, 250, 240, 260, 280, 300] }];
 
     const currentChart = {
         options: activeTab === "weekly" ? weeklyOptions : monthlyOptions,
@@ -134,51 +134,35 @@ function StatisticsChart() {
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">
-                        Grafik Aktivitas Peminjaman
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Aktivitas peminjaman berdasarkan minggu & bulan
-                    </p>
+                    <h3 className="text-sm font-bold text-gray-900">Statistik Peminjaman Buku</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">Pantau aktivitas peminjaman perpustakaan</p>
                 </div>
                 <ChartTab active={activeTab} setActive={setActiveTab} />
             </div>
-
-            <div className="w-full">
-                <ReactApexChart
-                    options={currentChart.options}
-                    series={currentChart.series}
-                    type="area"
-                    height={310}
-                />
-            </div>
+            <ReactApexChart options={currentChart.options} series={currentChart.series} type="area" height={240} />
         </div>
     );
 }
 
-// Main Dashboard Component
+// Main Dashboard Component - COMPACT
 export default function AdminDashboard() {
     const [admin, setAdmin] = useState(null);
     const [users, setUsers] = useState([]);
-    const [stats, setStats] = useState({
-        totalUsers: 0,
-        userRole: 0,
-        totalBuku: 0,
-        dipinjam: 0
-    });
+    const [stats, setStats] = useState({ totalUsers: 0, userRole: 0, totalBuku: 0, dipinjam: 0 });
     const [loading, setLoading] = useState(true);
+    const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
         const userData = localStorage.getItem("user");
-        if (userData) {
-            const parsed = JSON.parse(userData);
-            setAdmin(parsed);
-        }
+        if (userData) setAdmin(JSON.parse(userData));
         fetchUsers();
         fetchStats();
+
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+        return () => clearInterval(timer);
     }, []);
 
     const fetchUsers = async () => {
@@ -186,10 +170,7 @@ export default function AdminDashboard() {
             const res = await fetch("/api/users");
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
-            // Filter hanya user dengan role 'user', bukan admin
-            const filteredUsers = Array.isArray(data) 
-                ? data.filter(u => u.role === 'user').slice(0, 5) 
-                : [];
+            const filteredUsers = Array.isArray(data) ? data.filter(u => u.role === 'user').slice(0, 5) : [];
             setUsers(filteredUsers);
         } catch (err) {
             console.error("Error fetching users:", err);
@@ -201,19 +182,14 @@ export default function AdminDashboard() {
 
     const fetchStats = async () => {
         try {
-            const [usersRes, booksRes] = await Promise.all([
-                fetch("/api/users"),
-                fetch("/api/buku")
-            ]);
-
+            const [usersRes, booksRes] = await Promise.all([fetch("/api/users"), fetch("/api/buku")]);
             const usersData = await usersRes.json();
             const booksData = await booksRes.json();
-
             setStats({
                 totalUsers: Array.isArray(usersData) ? usersData.length : 0,
                 userRole: Array.isArray(usersData) ? usersData.filter(u => u.role === 'user').length : 0,
                 totalBuku: Array.isArray(booksData) ? booksData.length : 0,
-                dipinjam: 2 // Nanti bisa diganti dengan data real dari API peminjaman
+                dipinjam: 2
             });
         } catch (err) {
             console.error("Error fetching stats:", err);
@@ -222,7 +198,6 @@ export default function AdminDashboard() {
 
     const handleDelete = async (id) => {
         if (!confirm("Yakin ingin menghapus user ini?")) return;
-
         try {
             const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
             if (res.ok) {
@@ -241,133 +216,117 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Memuat dashboard...</p>
+                    <div className="relative w-16 h-16 mx-auto mb-3">
+                        <div className="w-16 h-16 border-3 border-blue-200 rounded-full"></div>
+                        <div className="w-16 h-16 border-3 border-blue-600 border-t-transparent rounded-full animate-spin absolute top-0"></div>
+                    </div>
+                    <p className="text-gray-700 text-sm font-semibold">Memuat Dashboard...</p>
                 </div>
             </div>
         );
     }
 
+    const formattedDate = currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const formattedTime = currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            {/* Header Banner */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-6 shadow-lg">
-                <h1 className="text-3xl font-bold text-white mb-2">Dashboard Admin</h1>
-                <p className="text-blue-100">
-                    Selamat datang kembali, <span className="font-semibold">{admin?.nama || "Admin"}</span>! 
-                    Berikut ringkasan perpustakaan hari ini.
-                </p>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <StatsCard
-                    icon={<Users className="w-8 h-8 text-white" />}
-                    label="Total Users"
-                    value={stats.totalUsers}
-                    color="blue"
-                />
-                <StatsCard
-                    icon={<UserCheck className="w-8 h-8 text-white" />}
-                    label="User Role"
-                    value={stats.userRole}
-                    color="green"
-                />
-                <StatsCard
-                    icon={<Library className="w-8 h-8 text-white" />}
-                    label="Total Buku"
-                    value={stats.totalBuku}
-                    color="purple"
-                />
-                <StatsCard
-                    icon={<BookOpen className="w-8 h-8 text-white" />}
-                    label="Dipinjam"
-                    value={stats.dipinjam}
-                    color="orange"
-                />
-            </div>
-
-           {/* Users Table */}
-<div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-    <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900">Daftar Users PERPUSTB</h2>
-    </div>
-    
-    <div className="overflow-x-auto">
-        <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Nama</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Role</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Phone</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Created At</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
-                </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-                {users.map((user, index) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-900">{user.id}</td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.nama}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                        <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                {user.role}
-                            </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{user.phone || '-'}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                            {new Date(user.created_at).toLocaleDateString('id-ID', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}
-                        </td>
-                        <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => window.location.href = `/admin/users/${user.id}`}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                    title="Lihat Detail"
-                                >
-                                    <Eye className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => window.location.href = `/admin/users/edit/${user.id}`}
-                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                    title="Edit"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(user.id)}
-                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                    title="Hapus"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+        <div>
+            <div className="p-4 lg:p-5">
+                {/* Compact Header */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-900 mb-1">
+                                Selamat Datang, {admin?.nama || "Admin"}! 👋
+                            </h1>
+                            <p className="text-gray-600 text-sm">Kelola sistem perpustakaan Anda dengan mudah</p>
+                        </div>
+                        <div className="text-right">
+                            <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-0.5">
+                                <Calendar className="w-3 h-3" />
+                                <span className="font-medium">{formattedDate}</span>
                             </div>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+                            <div className="flex items-center gap-1.5 text-blue-600 text-xs font-semibold">
+                                <Clock className="w-3 h-3" />
+                                <span>{formattedTime} WIB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    {users.length === 0 && (
-        <div className="text-center py-12">
-            <p className="text-gray-500">Belum ada data user</p>
-        </div>
-    )}
-</div>
-            {/* Statistics Chart */}
-            <StatisticsChart />
+                {/* Compact Stats Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+                    <StatsCard icon={<Users className="w-5 h-5 text-white" />} label="Total Users" value={stats.totalUsers} color="blue" trend="+12%" />
+                    <StatsCard icon={<UserCheck className="w-5 h-5 text-white" />} label="User Role" value={stats.userRole} color="green" trend="+8%" />
+                    <StatsCard icon={<Library className="w-5 h-5 text-white" />} label="Total Buku" value={stats.totalBuku} color="purple" trend="+5%" />
+                    <StatsCard icon={<BookOpen className="w-5 h-5 text-white" />} label="Dipinjam" value={stats.dipinjam} color="orange" />
+                </div>
+
+                {/* Compact Users Table */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                    <div className="p-4 border-b border-gray-100">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div>
+                                <h2 className="text-base font-bold text-gray-900">Daftar Pengguna Terbaru</h2>
+                                <p className="text-xs text-gray-500 mt-0.5">5 pengguna terakhir yang terdaftar di sistem</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">ID</th>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">Nama</th>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">Email</th>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">Role</th>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
+                                    <th className="px-4 py-2.5 text-left text-xs font-bold text-gray-600 uppercase">Terdaftar</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {users.map((user) => (
+                                    <tr key={user.id} className="hover:bg-blue-50/50 transition-colors">
+                                        <td className="px-4 py-3 text-xs font-semibold text-gray-900">#{user.id}</td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs font-semibold text-gray-900">{user.nama}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-xs text-gray-600">{user.email}</td>
+                                        <td className="px-4 py-3">
+                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                                {user.role}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3 text-xs text-gray-600">{user.phone || '-'}</td>
+                                        <td className="px-4 py-3 text-xs text-gray-600">
+                                            {new Date(user.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {users.length === 0 && (
+                        <div className="text-center py-12">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Users className="w-8 h-8 text-gray-400" />
+                            </div>
+                            <p className="text-gray-500 text-sm font-medium">Belum ada data pengguna</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Compact Chart */}
+                <StatisticsChart />
+            </div>
         </div>
     );
 }
