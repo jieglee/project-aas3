@@ -1,6 +1,9 @@
 import { db } from "../../../lib/db";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this-in-production";
 
 export async function POST(req) {
     try {
@@ -38,15 +41,29 @@ export async function POST(req) {
             );
         }
 
+        // Generate JWT token
+        const token = jwt.sign(
+            { 
+                userId: user.id, 
+                email: user.email,
+                role: user.role 
+            },
+            JWT_SECRET,
+            { expiresIn: '7d' } // Token berlaku 7 hari
+        );
+
         // Login berhasil
         return NextResponse.json(
             {
                 message: "Login berhasil!",
+                token: token,
                 user: {
                     id: user.id,
                     nama: user.nama,
                     email: user.email,
                     role: user.role,
+                    kelas: user.kelas,
+                    phone: user.phone
                 },
             },
             { status: 200 }

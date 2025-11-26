@@ -16,6 +16,8 @@ export async function GET(req) {
                 p.status,
                 p.denda,
                 p.denda_dibayar,
+                p.alasan_penolakan,
+                p.tanggal_ditolak,
                 p.created_at,
                 u.nama AS peminjam,
                 b.judul AS judulBuku,
@@ -29,7 +31,6 @@ export async function GET(req) {
 
         let params = [];
 
-        // Filter by user_id jika ada
         if (user_id) {
             query += " WHERE p.user_id = ?";
             params.push(user_id);
@@ -54,7 +55,6 @@ export async function POST(req) {
         console.log("=== CREATE PEMINJAMAN ===");
         console.log("Body:", body);
 
-        // Validasi input
         if (!user_id || !buku_id || !tanggal_pinjam || !tanggal_kembali) {
             return NextResponse.json(
                 { error: "Semua field wajib diisi" },
@@ -62,7 +62,6 @@ export async function POST(req) {
             );
         }
 
-        // Cek stok buku
         const [buku] = await db.execute(
             "SELECT id, judul, stok FROM buku WHERE id = ?",
             [buku_id]
@@ -82,7 +81,6 @@ export async function POST(req) {
             );
         }
 
-        // Cek apakah user sudah meminjam buku yang sama dan belum dikembalikan
         const [existingLoan] = await db.execute(
             `SELECT id FROM peminjaman 
              WHERE user_id = ? AND buku_id = ? AND status IN ('Menunggu', 'Dipinjam')`,
@@ -96,11 +94,10 @@ export async function POST(req) {
             );
         }
 
-        // Insert peminjaman dengan status "Menunggu"
         const [result] = await db.execute(
-                `INSERT INTO peminjaman 
-                (user_id, buku_id, tanggal_pinjam, tanggal_kembali, status, denda, denda_dibayar) 
-                VALUES (?, ?, ?, ?, 'Menunggu', 0, 0)`,
+            `INSERT INTO peminjaman 
+            (user_id, buku_id, tanggal_pinjam, tanggal_kembali, status, denda, denda_dibayar) 
+            VALUES (?, ?, ?, ?, 'Menunggu', 0, 0)`,
             [user_id, buku_id, tanggal_pinjam, tanggal_kembali]
         );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import SearchBuku from "./SearchBuku";
 
 export default function KelolaBukuHeader({ query, setQuery, onAdd }) {
@@ -10,7 +10,6 @@ export default function KelolaBukuHeader({ query, setQuery, onAdd }) {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-2">
-                        <BookOpen className="text-blue-600" size={28} />
                         <h1 className="text-2xl font-bold text-black">Kelola Buku</h1>
                     </div>
                     <p className="text-gray-600 text-sm mt-1">

@@ -1,15 +1,9 @@
 "use client";
 
-import { Filter } from "lucide-react";
 
 export default function Categories({ categoriesList, activeCategory, setActiveCategory }) {
     return (
         <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-                <Filter className="w-4 h-4 text-blue-600" />
-                <h2 className="text-base font-semibold text-gray-900">Kategori</h2>
-            </div>
-
             <div className="flex flex-wrap gap-2">
                 {categoriesList.map((category) => (
                     <button

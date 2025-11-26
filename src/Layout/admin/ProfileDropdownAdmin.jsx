@@ -4,27 +4,43 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { LogOut, ChevronDown, User, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ProfileDropdownAdmin() {
     const [open, setOpen] = useState(false);
     const [adminData, setAdminData] = useState(null);
     const [loading, setLoading] = useState(true);
     const dropdownRef = useRef(null);
+    const router = useRouter();
 
     // Fetch data admin yang sedang login
     useEffect(() => {
         const fetchAdminData = async () => {
             try {
-                // TODO: Ganti dengan endpoint API Anda
-                const response = await fetch('/api/auth/profile', {
+                // Ambil userId dari localStorage
+                const userId = localStorage.getItem('userId');
+                const token = localStorage.getItem('token');
+                
+                if (!userId) {
+                    console.error('UserId tidak ditemukan di localStorage');
+                    setLoading(false);
+                    return;
+                }
+
+                // Fetch dengan userId sebagai query parameter
+                const response = await fetch(`/api/auth/profile?userId=${userId}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': token ? `Bearer ${token}` : '',
+                        'Content-Type': 'application/json'
                     }
                 });
                 
-                if (!response.ok) throw new Error('Gagal mengambil data admin');
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data admin');
+                }
                 
                 const data = await response.json();
+                console.log('Admin data:', data);
                 
                 // Mapping sesuai struktur database users
                 const admin = {
@@ -34,7 +50,7 @@ export default function ProfileDropdownAdmin() {
                     phone: data.phone,
                     kelas: data.kelas,
                     role: data.role === 'admin' ? 'Administrator' : 'User',
-                    avatar: `/avatar-${data.id}.jpg` // atau null jika tidak ada
+                    avatar: null // Atau gunakan path avatar jika ada
                 };
                 
                 setAdminData(admin);
@@ -43,16 +59,19 @@ export default function ProfileDropdownAdmin() {
                 console.error("Error fetching admin data:", error);
                 
                 // Fallback data untuk development
-                const admin = {
-                    id: 7,
-                    name: "Admin",
-                    email: "admin@gmail.com",
-                    phone: "0000000000",
-                    kelas: "-",
-                    role: "Administrator",
-                    avatar: null
-                };
-                setAdminData(admin);
+                const userId = localStorage.getItem('userId');
+                if (userId) {
+                    const admin = {
+                        id: parseInt(userId),
+                        name: "Admin",
+                        email: "admin@gmail.com",
+                        phone: "-",
+                        kelas: "-",
+                        role: "Administrator",
+                        avatar: null
+                    };
+                    setAdminData(admin);
+                }
                 setLoading(false);
             }
         };
@@ -62,14 +81,15 @@ export default function ProfileDropdownAdmin() {
 
     const handleToggle = () => setOpen(!open);
 
-    const handleLogout = async () => {
-        // TODO: Implementasi logout
-        // await fetch('/api/auth/logout', { method: 'POST' });
-        // router.push('/login');
-        
+    const handleLogout = () => {
         if (confirm("Apakah Anda yakin ingin keluar?")) {
-            alert("Logout clicked - Implementasi logout di sini");
-            // Redirect ke halaman login
+            // Clear localStorage
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userRole');
+            
+            // Redirect ke login
+            router.push('/login');
         }
     };
 
@@ -102,16 +122,9 @@ export default function ProfileDropdownAdmin() {
                 className="flex items-center gap-3 cursor-pointer hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors"
             >
                 <div className="relative">
-                    <Image
-                        src={adminData?.avatar || "/admin.jpg"}
-                        alt={adminData?.name || "Admin"}
-                        width={40}
-                        height={40}
-                        className="rounded-full border-2 border-blue-300 object-cover"
-                        onError={(e) => {
-                            e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%231E3A8A' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
-                        }}
-                    />
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold border-2 border-blue-300">
+                        {adminData?.name?.charAt(0).toUpperCase() || 'A'}
+                    </div>
                     {/* Badge Admin */}
                     <div className="absolute -bottom-1 -right-1 bg-blue-600 rounded-full p-1">
                         <Shield size={10} className="text-white" />
@@ -132,10 +145,7 @@ export default function ProfileDropdownAdmin() {
                     animate={{ rotate: open ? 180 : 0 }}
                     transition={{ duration: 0.25 }}
                 >
-                    <ChevronDown
-                        size={18}
-                        className="text-[#1E3A8A]"
-                    />
+                    <ChevronDown size={18} className="text-[#1E3A8A]" />
                 </motion.div>
             </div>
 
@@ -152,16 +162,9 @@ export default function ProfileDropdownAdmin() {
                         {/* Header dengan foto besar */}
                         <div className="flex items-center gap-3 mb-4 pb-4 border-b border-blue-100">
                             <div className="relative">
-                                <Image
-                                    src={adminData?.avatar || "/admin-avatar.jpg"}
-                                    alt={adminData?.name || "Admin"}
-                                    width={56}
-                                    height={56}
-                                    className="rounded-full border-2 border-blue-300 object-cover"
-                                    onError={(e) => {
-                                        e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 24 24'%3E%3Cpath fill='%231E3A8A' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
-                                    }}
-                                />
+                                <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl border-2 border-blue-300">
+                                    {adminData?.name?.charAt(0).toUpperCase() || 'A'}
+                                </div>
                                 <div className="absolute -bottom-1 -right-1 bg-blue-600 rounded-full p-1.5">
                                     <Shield size={14} className="text-white" />
                                 </div>
@@ -184,11 +187,11 @@ export default function ProfileDropdownAdmin() {
                                     <span className="font-medium">Role:</span> {adminData?.role || "Administrator"}
                                 </span>
                             </div>
-                            {adminData?.nip && (
+                            {adminData?.phone && adminData.phone !== '-' && (
                                 <div className="flex items-center gap-2 text-sm">
                                     <Shield size={16} className="text-blue-600" />
                                     <span className="text-gray-700">
-                                        <span className="font-medium">NIP:</span> {adminData.nip}
+                                        <span className="font-medium">Phone:</span> {adminData.phone}
                                     </span>
                                 </div>
                             )}

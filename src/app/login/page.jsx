@@ -30,7 +30,10 @@ export default function Login() {
                 return;
             }
 
-            // Simpan semua data user ke localStorage
+            // Simpan token JWT
+            localStorage.setItem("token", data.token);
+            
+            // Simpan data user ke localStorage
             localStorage.setItem("userId", data.user.id);
             localStorage.setItem("userRole", data.user.role);
             
