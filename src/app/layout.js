@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import ClientWrapper from "../component/ClientWrapper";
+import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <ClientWrapper>{children}</ClientWrapper>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

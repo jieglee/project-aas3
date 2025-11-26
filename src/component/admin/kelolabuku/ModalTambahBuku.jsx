@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Upload, BookOpen, User, Building, Calendar, Tag, Package, FileText } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function ModalTambahBuku({ close, refresh }) {
     const [formData, setFormData] = useState({
@@ -40,76 +41,73 @@ export default function ModalTambahBuku({ close, refresh }) {
     };
 
     const handleSubmit = async () => {
-        console.log("🔵 Submit button clicked"); // Debug
+        console.log("🔵 Submit button clicked");
 
         if (!validateForm()) {
-            alert("Lengkapi semua field wajib!");
+            toast.error("Lengkapi semua field wajib!");
             return;
         }
 
         setLoading(true);
-        try {
-            console.log("🔵 Sending data:", formData); // Debug
 
-            const res = await fetch("/api/buku", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
+        const addBookPromise = fetch("/api/buku", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+        .then(async (res) => {
+            console.log("🔵 Response status:", res.status);
+            console.log("🔵 Response ok:", res.ok);
 
-            console.log("🔵 Response status:", res.status); // Debug
-            console.log("🔵 Response ok:", res.ok); // Debug
-
-            // Cek apakah response ada content
             const contentType = res.headers.get("content-type");
-            console.log("🔵 Content-Type:", contentType); // Debug
+            console.log("🔵 Content-Type:", contentType);
 
             if (!res.ok) {
-                // Coba baca sebagai text dulu
                 const text = await res.text();
-                console.log("❌ Error response:", text); // Debug
+                console.log("❌ Error response:", text);
                 
                 try {
                     const errorData = JSON.parse(text);
-                    alert(errorData.error || `Gagal menambahkan buku (Status: ${res.status})`);
+                    throw new Error(errorData.error || `Gagal menambahkan buku (Status: ${res.status})`);
                 } catch (e) {
-                    alert(`Gagal menambahkan buku: ${text || res.statusText}`);
+                    throw new Error(text || res.statusText || "Gagal menambahkan buku");
                 }
-                return;
             }
 
             // Response OK - parse JSON
             let data;
             try {
                 const text = await res.text();
-                console.log("✅ Success response:", text); // Debug
+                console.log("✅ Success response:", text);
                 
                 if (text) {
                     data = JSON.parse(text);
                 } else {
-                    // Jika response kosong tapi status OK
                     data = { success: true, message: "Buku berhasil ditambahkan!" };
                 }
             } catch (parseError) {
-                console.log("⚠️ Parse error, but request was successful"); // Debug
+                console.log("⚠️ Parse error, but request was successful");
                 data = { success: true, message: "Buku berhasil ditambahkan!" };
             }
 
-            alert(data.message || "Buku berhasil ditambahkan!");
-            refresh();
+            await refresh();
             close();
-
-        } catch (err) {
-            console.error("❌ Error:", err); // Debug
-            alert("Terjadi kesalahan jaringan. Silakan coba lagi.");
-        } finally {
+            return data;
+        })
+        .finally(() => {
             setLoading(false);
-        }
+        });
+
+        toast.promise(addBookPromise, {
+            loading: `Menambahkan buku "${formData.judul}"...`,
+            success: "Buku berhasil ditambahkan!",
+            error: (err) => err.message || "Terjadi kesalahan saat menambahkan buku",
+        });
     };
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 animate-fadeIn">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-hidden animate-slideUp">
+            <div className="bg-white rounded-2xl shadow-xl w-full text-gray-700 max-w-2xl max-h-[85vh] overflow-hidden animate-slideUp">
                 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-4 py-3 relative overflow-hidden">
@@ -245,7 +243,14 @@ export default function ModalTambahBuku({ close, refresh }) {
                 <div className="bg-gray-50 px-4 py-3 flex items-center justify-end gap-2 border-t border-gray-200 rounded-b-2xl">
                     <button onClick={close} disabled={loading} className="px-4 py-2 text-gray-700 bg-white border rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50">Batal</button>
                     <button onClick={handleSubmit} disabled={loading} className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm flex items-center gap-1 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50">
-                        {loading ? "Menyimpan..." : "Simpan"}
+                        {loading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Menyimpan...
+                            </>
+                        ) : (
+                            "Simpan"
+                        )}
                     </button>
                 </div>
             </div>

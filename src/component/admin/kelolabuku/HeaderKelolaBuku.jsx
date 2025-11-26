@@ -20,11 +20,12 @@ export default function KelolaBukuHeader({ query, setQuery, onAdd }) {
                 {/* OPEN MODAL */}
                 <button
                     onClick={onAdd}
-                    className="bg-blue-900 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl"
                 >
-                    <Plus size={18} /> Tambah Buku
+                    <Plus className="w-5 h-5" /> Tambah Buku
                 </button>
             </div>
+
 
             <div className="mt-4">
                 <SearchBuku query={query} setQuery={setQuery} />

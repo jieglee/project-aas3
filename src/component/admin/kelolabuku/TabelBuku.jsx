@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import Badge from "../../ui/Badge";
 import ModalEditBuku from "./Modaleditbuku";
 import BookImage from "./BookImage";
@@ -9,26 +10,24 @@ import BookImage from "./BookImage";
 export default function TabelBuku({ books, reload }) {
     const [editingBook, setEditingBook] = useState(null);
 
-    const handleDelete = async (id) => {
-        if (!confirm("Yakin ingin menghapus buku ini?")) return;
-
-        try {
-            const res = await fetch(`/api/buku/${id}`, {
-                method: "DELETE"
-            });
-
+    const handleDelete = async (id, judul) => {
+        const deletePromise = fetch(`/api/buku/${id}`, {
+            method: "DELETE"
+        })
+        .then(async (res) => {
             const data = await res.json();
-
-            if (res.ok) {
-                alert(data.message || "Buku berhasil dihapus!");
-                reload(); // Refresh data
-            } else {
-                alert(data.error || "Gagal menghapus buku");
+            if (!res.ok) {
+                throw new Error(data.error || "Gagal menghapus buku");
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Terjadi kesalahan saat menghapus buku");
-        }
+            await reload();
+            return data;
+        });
+
+        toast.promise(deletePromise, {
+            loading: `Menghapus buku "${judul}"...`,
+            success: "Buku berhasil dihapus!",
+            error: (err) => err.message || "Terjadi kesalahan saat menghapus buku",
+        });
     };
 
     const handleEdit = (book) => {
@@ -148,7 +147,7 @@ export default function TabelBuku({ books, reload }) {
                                                     <Pencil size={18} className="text-yellow-700" />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(buku.id)}
+                                                    onClick={() => handleDelete(buku.id, buku.judul)}
                                                     className="p-2 rounded-lg bg-red-100 hover:bg-red-200 transition shadow-sm"
                                                     title="Hapus Buku"
                                                 >

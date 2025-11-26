@@ -17,7 +17,7 @@ export default function StatisticsChart() {
         colors: ["#465FFF", "#9CB9FF"],
         chart: {
             fontFamily: "Outfit, sans-serif",
-            height: 310,
+            height: 260,
             type: "area",
             toolbar: { show: false },
         },
@@ -26,11 +26,11 @@ export default function StatisticsChart() {
             type: "gradient",
             gradient: { opacityFrom: 0.5, opacityTo: 0 },
         },
-        markers: { size: 0, hover: { size: 5 } },
+        markers: { size: 0, hover: { size: 4 } },
         grid: { yaxis: { lines: { show: true } }, xaxis: { lines: { show: false } } },
         dataLabels: { enabled: false },
         tooltip: { enabled: true },
-        yaxis: { labels: { style: { fontSize: "12px", colors: ["#6B7280"] } } },
+        yaxis: { labels: { style: { fontSize: "10px", colors: ["#6B7280"] } } },
     };
 
     // ==========================
@@ -42,6 +42,7 @@ export default function StatisticsChart() {
             categories: ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
             axisBorder: { show: false },
             axisTicks: { show: false },
+            labels: { style: { fontSize: "10px" } },
         },
     };
 
@@ -59,6 +60,7 @@ export default function StatisticsChart() {
                 "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
                 "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
             ],
+            labels: { style: { fontSize: "10px" } },
         },
     };
 
@@ -75,14 +77,14 @@ export default function StatisticsChart() {
     };
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+        <div className="rounded-lg border border-gray-200 bg-white px-3 pb-3 pt-3 sm:px-4 sm:pt-4">
             {/* HEADER */}
-            <div className="flex flex-col gap-5 mb-6 sm:flex-row sm:justify-between">
+            <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:justify-between">
                 <div className="w-full">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white/90">
                         Grafik Aktivitas Peminjaman
                     </h3>
-                    <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <p className="mt-0.5 text-gray-500 text-[9px] dark:text-gray-400">
                         Aktivitas peminjaman berdasarkan minggu & bulan
                     </p>
                 </div>
@@ -95,12 +97,12 @@ export default function StatisticsChart() {
 
             {/* CHART */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
-                <div className="min-w-[1000px] xl:min-w-full">
+                <div className="min-w-[800px] xl:min-w-full">
                     <ReactApexChart
                         options={currentChart.options}
                         series={currentChart.series}
                         type="area"
-                        height={310}
+                        height={260}
                     />
                 </div>
             </div>

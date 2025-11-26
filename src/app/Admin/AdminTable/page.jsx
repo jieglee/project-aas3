@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import LoanStats from "../../../component/admin/AdminTable/LoanStats";
 import SearchBar from "../../../component/admin/AdminTable/SearchBar";
 import LoanCard from "../../../component/admin/AdminTable/LoanCard";
@@ -35,27 +36,25 @@ export default function LoanManagement() {
     };
 
     const handleApprove = async (id) => {
-        if (!confirm("Setujui peminjaman ini?")) return;
-
-        try {
-            const res = await fetch(`/api/peminjaman/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "Dipinjam" })
-            });
-
+        const approvePromise = fetch(`/api/peminjaman/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "Dipinjam" })
+        })
+        .then(async (res) => {
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                alert("✅ Peminjaman berhasil disetujui!");
-                await fetchLoans();
-            } else {
-                alert("❌ " + (data.error || "Gagal menyetujui peminjaman"));
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || "Gagal menyetujui peminjaman");
             }
-        } catch (err) {
-            console.error("Error approving loan:", err);
-            alert("⚠️ Terjadi kesalahan: " + err.message);
-        }
+            await fetchLoans();
+            return data;
+        });
+
+        toast.promise(approvePromise, {
+            loading: "Menyetujui peminjaman...",
+            success: "Peminjaman berhasil disetujui!",
+            error: (err) => err.message || "Terjadi kesalahan saat menyetujui peminjaman",
+        });
     };
 
     const handleReject = (id) => {
@@ -65,59 +64,57 @@ export default function LoanManagement() {
 
     const confirmReject = async () => {
         if (!rejectReason.trim()) {
-            alert("⚠️ Mohon masukkan alasan penolakan!");
+            toast.error("Mohon masukkan alasan penolakan!");
             return;
         }
 
-        try {
-            const res = await fetch(`/api/peminjaman/${selectedLoan}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    status: "Ditolak",
-                    alasan_penolakan: rejectReason.trim()
-                })
-            });
-
+        const rejectPromise = fetch(`/api/peminjaman/${selectedLoan}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                status: "Ditolak",
+                alasan_penolakan: rejectReason.trim()
+            })
+        })
+        .then(async (res) => {
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                alert("✅ Peminjaman berhasil ditolak!");
-                setShowRejectModal(false);
-                setRejectReason("");
-                setSelectedLoan(null);
-                await fetchLoans();
-            } else {
-                alert("❌ " + (data.error || "Gagal menolak peminjaman"));
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || "Gagal menolak peminjaman");
             }
-        } catch (err) {
-            console.error("Error rejecting loan:", err);
-            alert("⚠️ Terjadi kesalahan: " + err.message);
-        }
+            setShowRejectModal(false);
+            setRejectReason("");
+            setSelectedLoan(null);
+            await fetchLoans();
+            return data;
+        });
+
+        toast.promise(rejectPromise, {
+            loading: "Menolak peminjaman...",
+            success: "Peminjaman berhasil ditolak!",
+            error: (err) => err.message || "Terjadi kesalahan saat menolak peminjaman",
+        });
     };
 
     const handleReturn = async (id) => {
-        if (!confirm("Konfirmasi bahwa buku ini sudah dikembalikan?")) return;
-
-        try {
-            const res = await fetch(`/api/peminjaman/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "Dikembalikan" })
-            });
-
+        const returnPromise = fetch(`/api/peminjaman/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "Dikembalikan" })
+        })
+        .then(async (res) => {
             const data = await res.json();
-
-            if (res.ok && data.success) {
-                alert("✅ Buku berhasil dikembalikan!");
-                await fetchLoans();
-            } else {
-                alert("❌ " + (data.error || "Gagal mengonfirmasi pengembalian"));
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || "Gagal mengonfirmasi pengembalian");
             }
-        } catch (err) {
-            console.error("Error returning book:", err);
-            alert("⚠️ Terjadi kesalahan: " + err.message);
-        }
+            await fetchLoans();
+            return data;
+        });
+
+        toast.promise(returnPromise, {
+            loading: "Memproses pengembalian...",
+            success: "Buku berhasil dikembalikan!",
+            error: (err) => err.message || "Terjadi kesalahan saat memproses pengembalian",
+        });
     };
 
     const filteredLoans = loans.filter(loan => {

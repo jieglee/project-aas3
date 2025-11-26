@@ -12,10 +12,11 @@ export default function ProfileDropdown() {
         nama: "Guest",
         email: "N/A",
     });
+    const [userPhoto, setUserPhoto] = useState("/anjing emo.jpg");
 
     const dropdownRef = useRef(null);
 
-    // Ambil data profile dari localStorage setiap kali komponen render
+    // Load profile data and photo from localStorage
     useEffect(() => {
         const loadProfile = () => {
             const stored = localStorage.getItem("profileData");
@@ -26,11 +27,17 @@ export default function ProfileDropdown() {
                     email: data.email || "N/A"
                 });
             }
+
+            // Load user photo
+            const photo = localStorage.getItem("userPhoto");
+            if (photo) {
+                setUserPhoto(photo);
+            }
         };
 
         loadProfile();
 
-        // Listen untuk perubahan di localStorage (jika diupdate dari tab lain)
+        // Listen for changes in localStorage (if updated from another tab)
         window.addEventListener('storage', loadProfile);
         
         return () => {
@@ -41,12 +48,13 @@ export default function ProfileDropdown() {
     const handleToggle = () => setOpen(!open);
 
     const handleLogout = () => {
-        // Hapus semua data dari localStorage
+        // Remove all data from localStorage
         localStorage.removeItem("userId");
         localStorage.removeItem("userRole");
         localStorage.removeItem("profileData");
+        localStorage.removeItem("userPhoto");
         
-        // Redirect ke halaman login
+        // Redirect to login page
         router.push("/login");
     };
 
@@ -64,18 +72,14 @@ export default function ProfileDropdown() {
         <div className="relative" ref={dropdownRef}>
             <div onClick={handleToggle} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
                 <Image
-                    src={
-                        typeof window !== 'undefined' 
-                        ? localStorage.getItem("userPhoto") || "/anjing emo.jpg"
-                        : "/anjing emo.jpg"
-                    }
+                    src={userPhoto}
                     alt="User"
                     width={32}
                     height={32}
                     className="rounded-full object-cover"
                 />
 
-                {/* Nama dinamis */}
+                {/* Dynamic name */}
                 <span className="font-semibold text-[#1E3A8A] text-sm">
                     {profile.nama}
                 </span>

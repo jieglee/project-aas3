@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Calendar, Clock, CheckCircle, BookOpen } from "lucide-react";
+import { X, Clock, Calendar, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ModalWaitingAdmin({
@@ -8,8 +8,7 @@ export default function ModalWaitingAdmin({
     onClose,
     book,
     borrowDate,
-    returnDate,
-    fine = 0
+    returnDate
 }) {
     const router = useRouter();
 
@@ -23,124 +22,101 @@ export default function ModalWaitingAdmin({
     if (!show || !book) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-slideUp">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
 
                 {/* Header */}
-                <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                            <Clock className="w-4 h-4 text-white" />
+                <div className="bg-blue-600 px-6 py-4 rounded-t-xl">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                                <Clock className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-bold text-white">Menunggu Konfirmasi</h2>
+                                <p className="text-sm text-blue-100">Sedang diproses admin</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-sm font-bold text-white">Menunggu Konfirmasi</h2>
-                            <p className="text-blue-100 text-xs">Sedang diproses admin</p>
-                        </div>
+                        <button
+                            onClick={onClose}
+                            className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-all"
+                        >
+                            <X size={20} />
+                        </button>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-1 transition-all"
-                    >
-                        <X size={18} />
-                    </button>
                 </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-3">
-
-                    {/* Status */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-blue-900 text-xs font-semibold mb-1">Status Peminjaman</p>
-                        <p className="text-blue-700 text-xs">Permintaan Anda sedang ditinjau oleh admin perpustakaan.</p>
-                    </div>
+                <div className="p-6 space-y-4">
 
                     {/* Book Info */}
-                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                        <div className="flex gap-2 mb-2">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="flex gap-3">
                             <img
                                 src={getBookImageUrl(book.img)}
                                 alt={book.judul}
-                                className="w-12 h-16 object-cover rounded border border-gray-300"
+                                className="w-20 h-28 object-cover rounded-lg shadow-sm"
                                 onError={(e) => {
                                     e.target.src = "/api/placeholder/80/112";
                                 }}
                             />
-                            <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-gray-900 text-xs leading-tight line-clamp-2 mb-1">
+                            <div className="flex-1">
+                                <h4 className="font-bold text-gray-900 text-sm mb-1 line-clamp-2">
                                     {book.judul}
                                 </h4>
-                                <p className="text-xs text-gray-600">{book.penulis}</p>
-                                <div className="mt-1 inline-flex items-center gap-1 bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-bold">
-                                    <CheckCircle className="w-2.5 h-2.5" />
+                                <p className="text-xs text-gray-600 mb-2">{book.penulis}</p>
+                                <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-semibold">
+                                    <CheckCircle className="w-3 h-3" />
                                     Tersedia
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Dates */}
-                        <div className="space-y-1.5 pt-2 border-t border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600 text-xs">Tanggal Pinjam</span>
-                                <span className="font-semibold text-gray-900 text-xs">
-                                    {new Date(borrowDate).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric"
-                                    })}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600 text-xs">Batas Kembali</span>
-                                <span className="font-semibold text-gray-900 text-xs">
-                                    {new Date(returnDate).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric"
-                                    })}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Timeline */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-3">
-                        <div className="space-y-2">
-                            <div className="flex gap-2">
-                                <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
-                                    <CheckCircle className="w-3 h-3 text-white" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-gray-900 text-xs">Permintaan Dikirim</p>
-                                    <p className="text-xs text-gray-500">Berhasil mengajukan</p>
-                                </div>
+                    {/* Dates */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="flex items-center gap-2 text-blue-700">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-medium">Tanggal Pinjam</span>
                             </div>
-                            <div className="flex gap-2">
-                                <div className="w-5 h-5 bg-yellow-500 rounded flex items-center justify-center flex-shrink-0">
-                                    <Clock className="w-3 h-3 text-white" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-gray-900 text-xs">Menunggu Admin</p>
-                                    <p className="text-xs text-gray-500">Sedang diverifikasi</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center flex-shrink-0">
-                                    <CheckCircle className="w-3 h-3 text-white" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-gray-400 text-xs">Menunggu Persetujuan</p>
-                                    <p className="text-xs text-gray-400">Belum diproses</p>
-                                </div>
-                            </div>
+                            <span className="font-semibold text-blue-900 text-sm">
+                                {new Date(borrowDate).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric"
+                                })}
+                            </span>
                         </div>
+
+                        <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <div className="flex items-center gap-2 text-orange-700">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-medium">Batas Kembali</span>
+                            </div>
+                            <span className="font-semibold text-orange-900 text-sm">
+                                {new Date(returnDate).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric"
+                                })}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Info Box */}
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-r-lg">
+                        <p className="text-sm text-yellow-800">
+                            <span className="font-semibold">⏱️ Catatan:</span> Permintaan Anda akan diproses dalam waktu 3x24 jam
+                        </p>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="bg-gray-50 px-4 py-3 flex gap-2 border-t border-gray-200">
+                <div className="px-6 pb-6 flex gap-3">
                     <button
                         onClick={onClose}
-                        className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg bg-white hover:bg-gray-100 border border-gray-300 text-gray-700 transition-all"
+                        className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all"
                     >
                         Tutup
                     </button>
@@ -149,35 +125,12 @@ export default function ModalWaitingAdmin({
                             onClose();
                             router.push("/user/Peminjaman");
                         }}
-                        className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all"
+                        className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all"
                     >
-                        Ke Riwayat
+                        Lihat Status
                     </button>
                 </div>
             </div>
-
-            <style jsx>{`
-                @keyframes fadeIn { 
-                    from { opacity: 0; } 
-                    to { opacity: 1; } 
-                }
-                @keyframes slideUp { 
-                    from { 
-                        opacity: 0; 
-                        transform: translateY(20px); 
-                    } 
-                    to { 
-                        opacity: 1; 
-                        transform: translateY(0); 
-                    } 
-                }
-                .animate-fadeIn { 
-                    animation: fadeIn 0.2s ease-out; 
-                }
-                .animate-slideUp { 
-                    animation: slideUp 0.3s ease-out; 
-                }
-            `}</style>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { X, User, Mail, Phone, Lock, School, Shield } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function UserModal({ isOpen, onClose, fetchUsers, editData }) {
     const [form, setForm] = useState({
@@ -94,14 +95,14 @@ const handleSubmit = async (e) => {
         });
         const data = await res.json();
         if (res.ok) {
-            alert(data.message || "User berhasil disimpan!");
+            toast.success(data.message || "User berhasil disimpan!");
             fetchUsers();
             handleClose();
         } else {
-            alert(data.error || "Terjadi kesalahan");
+            toast.error(data.error || "Terjadi kesalahan");
         }
     } catch (err) {
-        alert("Terjadi kesalahan saat menyimpan user");
+        toast.error("Terjadi kesalahan saat menyimpan user");
         console.error(err);
     } finally {
         setLoading(false);
@@ -125,7 +126,7 @@ const handleSubmit = async (e) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative transform transition-all animate-slideUp">
+            <div className="bg-white rounded-2xl w-full text-gray-700 max-w-lg shadow-2xl relative transform transition-all animate-slideUp">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 p-6 rounded-t-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Upload, BookOpen, User, Building, Calendar, Tag, Package, FileText } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function ModalEditBuku({ book, close, refresh }) {
     const [formData, setFormData] = useState({
@@ -92,44 +93,46 @@ export default function ModalEditBuku({ book, close, refresh }) {
 
     const handleSubmit = async () => {
         if (!validateForm()) {
-            alert("Lengkapi semua field wajib!");
+            toast.error("Lengkapi semua field wajib!");
             return;
         }
 
         setLoading(true);
-        try {
-            // Bersihkan URL sebelum submit
-            const cleanData = {
-                ...formData,
-                img: cleanImageUrl(formData.img)
-            };
 
-            const res = await fetch(`/api/buku/${book.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(cleanData)
-            });
+        // Bersihkan URL sebelum submit
+        const cleanData = {
+            ...formData,
+            img: cleanImageUrl(formData.img)
+        };
 
+        const updatePromise = fetch(`/api/buku/${book.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(cleanData)
+        })
+        .then(async (res) => {
             const data = await res.json();
-
-            if (res.ok) {
-                alert(data.message || "Buku berhasil diupdate!");
-                refresh();
-                close();
-            } else {
-                alert(data.error || "Gagal mengupdate buku");
+            if (!res.ok) {
+                throw new Error(data.error || "Gagal mengupdate buku");
             }
-        } catch (err) {
-            console.error(err);
-            alert("Terjadi kesalahan!");
-        } finally {
+            await refresh();
+            close();
+            return data;
+        })
+        .finally(() => {
             setLoading(false);
-        }
+        });
+
+        toast.promise(updatePromise, {
+            loading: `Mengupdate buku "${formData.judul}"...`,
+            success: "Buku berhasil diupdate!",
+            error: (err) => err.message || "Terjadi kesalahan saat mengupdate buku",
+        });
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 animate-fadeIn">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-hidden animate-slideUp">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm  flex items-center justify-center z-50 p-2 animate-fadeIn">
+            <div className="bg-white rounded-2xl shadow-xl  text-gray-700 w-full max-w-2xl max-h-[85vh] overflow-hidden animate-slideUp">
                 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-orange-600 px-4 py-3 relative overflow-hidden">
@@ -327,7 +330,14 @@ export default function ModalEditBuku({ book, close, refresh }) {
                         disabled={loading} 
                         className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg text-sm flex items-center gap-1 hover:from-yellow-600 hover:to-orange-700 disabled:opacity-50"
                     >
-                        {loading ? "Menyimpan..." : "Update Buku"}
+                        {loading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Menyimpan...
+                            </>
+                        ) : (
+                            "Update Buku"
+                        )}
                     </button>
                 </div>
             </div>

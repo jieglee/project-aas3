@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Toaster } from "react-hot-toast";
+
 
 import BookImage from "../../../../component/user/Detail/BookImage";
 import BookInfo from "../../../../component/user/Detail/BookInfo";
@@ -69,7 +69,6 @@ export default function DetailPage() {
 
     return (
         <>
-            <Toaster position="top-right" />
 
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
