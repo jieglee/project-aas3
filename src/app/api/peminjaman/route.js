@@ -98,9 +98,9 @@ export async function POST(req) {
 
         // Insert peminjaman dengan status "Menunggu"
         const [result] = await db.execute(
-            `INSERT INTO peminjaman 
-             (user_id, buku_id, tanggal_pinjam, tanggal_kembali, status, denda, denda_dibayar) 
-             VALUES (?, ?, ?, ?, 'Menunggu', 0, 0)`,
+                `INSERT INTO peminjaman 
+                (user_id, buku_id, tanggal_pinjam, tanggal_kembali, status, denda, denda_dibayar) 
+                VALUES (?, ?, ?, ?, 'Menunggu', 0, 0)`,
             [user_id, buku_id, tanggal_pinjam, tanggal_kembali]
         );
 

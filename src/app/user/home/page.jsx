@@ -163,8 +163,6 @@ export default function HomePage() {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div className="flex-1">
                             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                                Status: Aktif
                             </div>
                             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
                                 Selamat Datang Kembali,<br/>
@@ -270,7 +268,7 @@ export default function HomePage() {
                             <h2 className="text-3xl font-bold text-gray-900 mb-1">Peminjaman Aktif</h2>
                             <p className="text-gray-500">Buku yang sedang Anda pinjam</p>
                         </div>
-                        <Link href="/user/borrowed">
+                        <Link href="/user/Peminjaman">
                             <button className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2 bg-blue-50 hover:bg-blue-100 px-5 py-2.5 rounded-xl transition-all">
                                 Lihat Semua
                                 <BookOpen className="w-4 h-4" />

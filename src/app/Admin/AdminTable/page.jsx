@@ -46,21 +46,32 @@ export default function LoanManagement() {
         if (!confirm("Setujui peminjaman ini?")) return;
 
         try {
+            console.log("🟢 Approving loan ID:", id);
+            
             const res = await fetch(`/api/peminjaman/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: "Dipinjam" })
             });
 
-            if (res.ok) {
+            console.log("📡 Response status:", res.status);
+            
+            // Parse response
+            const data = await res.json();
+            console.log("📦 Response data:", data);
+
+            if (res.ok && data.success) {
                 alert("✅ Peminjaman berhasil disetujui!");
-                fetchLoans();
+                await fetchLoans();
             } else {
-                alert("❌ Gagal menyetujui peminjaman");
+                // Tampilkan error message yang spesifik
+                const errorMsg = data.error || data.details || data.message || "Gagal menyetujui peminjaman";
+                console.error("❌ Error from API:", errorMsg);
+                alert("❌ " + errorMsg);
             }
         } catch (err) {
-            console.error("Error approving loan:", err);
-            alert("⚠️ Terjadi kesalahan saat menyetujui peminjaman");
+            console.error("❌ Error approving loan:", err);
+            alert("⚠️ Terjadi kesalahan: " + err.message);
         }
     };
 
@@ -76,9 +87,6 @@ export default function LoanManagement() {
         console.log("========================================");
         console.log("📝 Selected Loan ID:", selectedLoan);
         console.log("📝 Reject Reason:", rejectReason);
-        console.log("📝 Reject Reason Length:", rejectReason.length);
-        console.log("📝 Reject Reason Trimmed:", rejectReason.trim());
-        console.log("📝 Reject Reason Type:", typeof rejectReason);
 
         if (!rejectReason.trim()) {
             console.log("❌ Alasan kosong!");
@@ -103,44 +111,25 @@ export default function LoanManagement() {
             });
 
             console.log("📡 Response status:", res.status);
-            console.log("📡 Response ok?:", res.ok);
 
-            // Cek apakah response adalah JSON
-            const contentType = res.headers.get("content-type");
-            console.log("📡 Content-Type:", contentType);
-            
-            let data;
-            
-            if (contentType && contentType.includes("application/json")) {
-                data = await res.json();
-                console.log("📦 Response data:", JSON.stringify(data, null, 2));
-            } else {
-                // Jika bukan JSON, read as text untuk debugging
-                const text = await res.text();
-                console.error("❌ Non-JSON response:", text);
-                throw new Error("Server tidak mengembalikan JSON response");
-            }
+            const data = await res.json();
+            console.log("📦 Response data:", JSON.stringify(data, null, 2));
 
             if (res.ok && data.success) {
                 console.log("✅ SUKSES! Peminjaman berhasil ditolak");
-                console.log("✅ Alasan yang tersimpan:", data.alasan_penolakan);
                 alert("✅ Peminjaman berhasil ditolak!");
                 setShowRejectModal(false);
                 setRejectReason("");
                 setSelectedLoan(null);
-                
-                console.log("🔄 Fetching loans again...");
                 await fetchLoans();
-                console.log("========================================\n");
             } else {
-                console.error("❌ Error response:", data);
-                alert("❌ Gagal menolak peminjaman: " + (data.error || data.message || "Unknown error"));
+                const errorMsg = data.error || data.details || data.message || "Gagal menolak peminjaman";
+                console.error("❌ Error response:", errorMsg);
+                alert("❌ " + errorMsg);
             }
         } catch (err) {
             console.error("❌❌❌ ERROR:", err);
-            console.error("Error message:", err.message);
-            console.error("Error stack:", err.stack);
-            alert("⚠️ Terjadi kesalahan saat menolak peminjaman: " + err.message);
+            alert("⚠️ Terjadi kesalahan: " + err.message);
         }
     };
 
@@ -148,21 +137,30 @@ export default function LoanManagement() {
         if (!confirm("Konfirmasi bahwa buku ini sudah dikembalikan?")) return;
 
         try {
+            console.log("📥 Returning book, loan ID:", id);
+            
             const res = await fetch(`/api/peminjaman/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: "Dikembalikan" })
             });
 
-            if (res.ok) {
+            console.log("📡 Response status:", res.status);
+            
+            const data = await res.json();
+            console.log("📦 Response data:", data);
+
+            if (res.ok && data.success) {
                 alert("✅ Buku berhasil dikembalikan!");
-                fetchLoans();
+                await fetchLoans();
             } else {
-                alert("❌ Gagal mengonfirmasi pengembalian");
+                const errorMsg = data.error || data.details || data.message || "Gagal mengonfirmasi pengembalian";
+                console.error("❌ Error from API:", errorMsg);
+                alert("❌ " + errorMsg);
             }
         } catch (err) {
-            console.error("Error returning book:", err);
-            alert("⚠️ Terjadi kesalahan saat mengonfirmasi pengembalian");
+            console.error("❌ Error returning book:", err);
+            alert("⚠️ Terjadi kesalahan: " + err.message);
         }
     };
 
@@ -174,7 +172,6 @@ export default function LoanManagement() {
     ];
 
     const getTabCount = (status) => {
-        // Tab "Riwayat" menampilkan Dikembalikan DAN Ditolak
         if (status === "Dikembalikan") {
             return loans.filter(l => l.status === "Dikembalikan" || l.status === "Ditolak").length;
         }
@@ -182,7 +179,6 @@ export default function LoanManagement() {
     };
 
     const filteredLoans = loans.filter(loan => {
-        // Tab "Riwayat" menampilkan Dikembalikan DAN Ditolak
         const matchTab = activeTab === "Dikembalikan" 
             ? (loan.status === "Dikembalikan" || loan.status === "Ditolak")
             : loan.status === activeTab;
@@ -316,21 +312,11 @@ export default function LoanManagement() {
                         filteredLoans.map((loan) => {
                             const imageSrc = getImageSrc(loan.img);
                             
-                            // Debug log untuk setiap loan
-                            if (loan.status === "Ditolak") {
-                                console.log("🔍 Loan ditolak:", {
-                                    id: loan.id,
-                                    status: loan.status,
-                                    alasan_penolakan: loan.alasan_penolakan,
-                                    hasAlasan: !!loan.alasan_penolakan
-                                });
-                            }
-                            
                             return (
                                 <div key={loan.id} className="bg-white rounded-xl shadow hover:shadow-md transition-all duration-300 overflow-hidden">
                                     <div className="flex gap-0">
                                         
-                                        {/* Book Cover - Lebih Besar */}
+                                        {/* Book Cover */}
                                         <div className="flex-shrink-0 w-40 relative">
                                             <img
                                                 src={imageSrc || fallbackSVG}
@@ -399,7 +385,7 @@ export default function LoanManagement() {
                                                 )}
                                             </div>
 
-                                            {/* Compact Actions - UNIFORM SIZE */}
+                                            {/* Actions */}
                                             <div className="min-h-[44px]">
                                                 {activeTab === "Menunggu" && (
                                                     <div className="flex gap-2">
@@ -465,8 +451,8 @@ export default function LoanManagement() {
                                                                 <div className="flex items-center justify-between mb-2">
                                                                     <span className="text-xs font-bold text-red-600 uppercase tracking-wide">Ditolak</span>
                                                                     <span className="text-xs text-gray-500">
-                                                                        {loan.tanggal_pinjam 
-                                                                            ? new Date(loan.tanggal_pinjam).toLocaleDateString('id-ID', {
+                                                                        {loan.tanggal_ditolak 
+                                                                            ? new Date(loan.tanggal_ditolak).toLocaleDateString('id-ID', {
                                                                                 day: 'numeric',
                                                                                 month: 'short'
                                                                             })
@@ -490,7 +476,7 @@ export default function LoanManagement() {
                     )}
                 </div>
 
-                {/* Compact Rejection Modal */}
+                {/* Rejection Modal */}
                 {showRejectModal && selectedLoan && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
@@ -518,10 +504,7 @@ export default function LoanManagement() {
                                 </label>
                                 <textarea
                                     value={rejectReason}
-                                    onChange={(e) => {
-                                        console.log("📝 Textarea changed:", e.target.value);
-                                        setRejectReason(e.target.value);
-                                    }}
+                                    onChange={(e) => setRejectReason(e.target.value)}
                                     placeholder="Contoh: Stok buku sedang habis, Buku sedang dalam perbaikan, dll."
                                     className="w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 bg-gray-50 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 focus:bg-white transition-all resize-none placeholder:text-gray-400"
                                     rows="3"
@@ -535,7 +518,6 @@ export default function LoanManagement() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => {
-                                        console.log("❌ Batal diklik");
                                         setShowRejectModal(false);
                                         setRejectReason("");
                                         setSelectedLoan(null);
@@ -545,10 +527,7 @@ export default function LoanManagement() {
                                     Batal
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        console.log("🔴 Tolak Peminjaman button clicked");
-                                        confirmReject();
-                                    }}
+                                    onClick={confirmReject}
                                     className="flex-1 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-lg text-sm font-bold transition-all"
                                 >
                                     Tolak Peminjaman
