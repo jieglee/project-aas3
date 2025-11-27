@@ -5,5 +5,5 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src", "src/app/user/detail"]
+  "include": ["src", "src/app/user/detail", "src/middleware.js"]
 }

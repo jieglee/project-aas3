@@ -13,7 +13,7 @@ export default function CatalogPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("Semua");
 
-    const categoriesList = ["Semua", "Nonfiksi", "Fiksi", "Pendidikan", "Komik"];
+    const categoriesList = ["Semua", "Nonfiksi", "Fiksi", "Pelajaran", "Komik"];
 
     useEffect(() => {
         async function fetchBooks() {

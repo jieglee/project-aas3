@@ -277,7 +277,7 @@ export default function ModalEditBuku({ book, close, refresh }) {
                                         <option value="">Pilih</option>
                                         <option value="Fiksi">Fiksi</option>
                                         <option value="Nonfiksi">Nonfiksi</option>
-                                        <option value="Pendidikan">Pendidikan</option>
+                                        <option value="Pelajaran">Pelajaran</option>
                                         <option value="Komik">Komik</option>
                                     </select>
                                 </div>
