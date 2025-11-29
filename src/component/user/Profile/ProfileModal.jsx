@@ -58,12 +58,20 @@ export default function ProfileModal({ isOpen, onClose, initialData, onSave }) {
     };
 
     const handleSubmit = () => {
+        // Simpan foto ke localStorage
         if (photoPreview) {
             localStorage.setItem("userPhoto", photoPreview);
         } else {
             localStorage.removeItem("userPhoto");
         }
-        onSave(data);
+        
+        // Simpan data profile dengan timestamp untuk trigger update
+        const updatedData = {
+            ...data,
+            lastUpdated: Date.now() // Tambahkan timestamp
+        };
+        
+        onSave(updatedData);
     };
 
     return (

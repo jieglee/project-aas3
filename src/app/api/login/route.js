@@ -52,8 +52,9 @@ export async function POST(req) {
             { expiresIn: '7d' } // Token berlaku 7 hari
         );
 
-        // Login berhasil
-        return NextResponse.json(
+        // ✅ PERUBAHAN 1: Buat response object dulu (sebelumnya langsung return JSON)
+        // Ini penting karena kita perlu set cookie sebelum return
+        const response = NextResponse.json(
             {
                 message: "Login berhasil!",
                 token: token,
@@ -68,6 +69,23 @@ export async function POST(req) {
             },
             { status: 200 }
         );
+
+        // ✅ PERUBAHAN 2: SET TOKEN DI COOKIE (INI YANG PALING PENTING!)
+        // Tanpa ini, middleware tidak bisa baca token karena middleware jalan di server
+        // localStorage hanya ada di browser, jadi middleware perlu cookie
+        response.cookies.set({
+            name: "token",              // Nama cookie
+            value: token,                // Value = JWT token
+            httpOnly: true,              // Tidak bisa diakses JavaScript (keamanan dari XSS)
+            secure: process.env.NODE_ENV === "production", // HTTPS only di production
+            sameSite: "lax",            // CSRF protection
+            maxAge: 60 * 60 * 24 * 7,   // 7 hari (dalam detik)
+            path: "/",                   // Cookie berlaku untuk semua path
+        });
+
+        // ✅ PERUBAHAN 3: Return response yang sudah di-set cookie-nya
+        return response;
+
     } catch (err) {
         console.error("Error login:", err);
         return NextResponse.json(

@@ -23,6 +23,7 @@ export default function Login() {
             });
 
             const data = await res.json();
+            // console.log(data)
 
             if (!res.ok) {
                 setError(data.message);
@@ -46,6 +47,8 @@ export default function Login() {
                 phone: data.user.phone || "-",
                 role: data.user.role
             };
+
+            // console.log(profileData)
             
             localStorage.setItem("profileData", JSON.stringify(profileData));
 
@@ -53,7 +56,9 @@ export default function Login() {
             if (data.user.role === "admin") {
                 router.push("/Admin/Dashboard");
             } else {
+                router.refresh()
                 router.push("/user/home");
+                console.log(profileData.role)
             }
         } catch (err) {
             console.error("Error login:", err);

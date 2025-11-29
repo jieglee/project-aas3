@@ -1,14 +1,39 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { User } from "lucide-react";
+
 export default function ProfileCard({ profile, onEditClick }) {
+    const [photoPreview, setPhotoPreview] = useState(null);
+
+    // Load foto dari localStorage setiap kali component di-render
+    useEffect(() => {
+        const savedPhoto = localStorage.getItem("userPhoto");
+        if (savedPhoto) {
+            setPhotoPreview(savedPhoto);
+        } else {
+            setPhotoPreview(null);
+        }
+    }, [profile]); // Re-run ketika profile berubah
+
     return (
         <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-sm p-6 text-center">
                 {/* Profile Image */}
                 <div className="relative inline-block mb-4">
-                    <img
-                        src="/anjing emo.jpg"
-                        alt="Profile"
-                        className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-gray-100"
-                    />
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden mx-auto border-4 border-gray-100 bg-gradient-to-br from-blue-50 to-indigo-50">
+                        {photoPreview ? (
+                            <img
+                                src={photoPreview}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <User className="w-16 h-16 text-indigo-300" />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Name & ID */}
