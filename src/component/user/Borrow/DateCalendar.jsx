@@ -21,12 +21,24 @@ export default function DateCalendar({
         return { daysInMonth, startingDayOfWeek };
     };
 
+    // Helper function untuk mendapatkan tanggal lokal tanpa timezone issue
+    const getLocalDateString = (year, month, day) => {
+        const date = new Date(year, month, day);
+        const offset = date.getTimezoneOffset();
+        const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+        return localDate.toISOString().split('T')[0];
+    };
+
     const renderCalendar = () => {
         const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
         const days = [];
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const selectedDate = borrowDate ? new Date(borrowDate) : null;
+        
+        // Ambil tanggal hari ini dalam format lokal
+        const now = new Date();
+        const todayString = getLocalDateString(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        // Parse selected date
+        const selectedDateString = borrowDate;
 
         // Empty cells for days before month starts
         for (let i = 0; i < startingDayOfWeek; i++) {
@@ -37,12 +49,15 @@ export default function DateCalendar({
 
         // Days of the month
         for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-            date.setHours(0, 0, 0, 0);
-            const dateString = date.toISOString().split('T')[0];
-            const isToday = date.getTime() === today.getTime();
-            const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
-            const isPast = date < today;
+            const dateString = getLocalDateString(
+                currentMonth.getFullYear(), 
+                currentMonth.getMonth(), 
+                day
+            );
+            
+            const isToday = dateString === todayString;
+            const isSelected = dateString === selectedDateString;
+            const isPast = dateString < todayString;
 
             days.push(
                 <button
@@ -50,10 +65,19 @@ export default function DateCalendar({
                     onClick={() => {
                         if (!isPast) {
                             setBorrowDate(dateString);
-                            // Auto set return date (maksimal 20 hari dari tanggal pinjam)
-                            const returnDate = new Date(date);
-                            returnDate.setDate(returnDate.getDate() + 20);
-                            setReturnDate(returnDate.toISOString().split('T')[0]);
+                            
+                            // Auto set return date (14 hari dari tanggal pinjam)
+                            const borrowDateObj = new Date(dateString + 'T00:00:00');
+                            const returnDateObj = new Date(borrowDateObj);
+                            returnDateObj.setDate(returnDateObj.getDate() + 14);
+                            
+                            const returnDateString = getLocalDateString(
+                                returnDateObj.getFullYear(),
+                                returnDateObj.getMonth(),
+                                returnDateObj.getDate()
+                            );
+                            
+                            setReturnDate(returnDateString);
                         }
                     }}
                     disabled={isPast}
@@ -127,6 +151,13 @@ export default function DateCalendar({
                 </div>
             </div>
 
+            {/* Info */}
+            <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-800">
+                <p className="font-medium">💡 Maksimal peminjaman 14 hari</p>
+                <p className="text-xs mt-1 text-blue-600">
+                    Tanggal pengembalian otomatis diatur 14 hari setelah tanggal pinjam
+                </p>
+            </div>
         </div>
     );
 }

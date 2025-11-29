@@ -8,7 +8,7 @@ export default function InfoAlert() {
                 <div className="flex-1">
                     <p className="text-sm text-blue-900 font-semibold mb-1">Perhatian</p>
                     <p className="text-xs text-blue-800 leading-relaxed">
-                        Masa peminjaman maksimal <span className="font-bold">20 hari</span>. 
+                        Masa peminjaman maksimal <span className="font-bold">14 hari</span>. 
                         Keterlambatan pengembalian akan dikenakan denda <span className="font-bold">Rp 5.000 per hari</span>. 
                         Mohon kembalikan buku tepat waktu.
                     </p>

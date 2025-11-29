@@ -30,7 +30,7 @@ export default function ProfilPage() {
         const storedUserId = localStorage.getItem("userId");
 
         if (!storedUserId) {
-            router.push("/login");
+            router.push("/user/profile");
             return;
         }
 

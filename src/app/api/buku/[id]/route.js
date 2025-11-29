@@ -14,7 +14,7 @@ export async function GET(req, context) {
         }
 
         return NextResponse.json(rows[0]);
-    } catch (err) {
+    } catch (err) {  
         console.error("ERROR API BUKU:", err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

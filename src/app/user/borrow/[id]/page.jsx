@@ -31,10 +31,10 @@ export default function BookDetailPage() {
                 const data = await res.json();
                 setBook(data);
                 
-                // Set default dates (maksimal 20 hari)
+                // Set default dates (maksimal 14 hari)
                 const today = new Date();
                 const maxReturnDate = new Date(today);
-                maxReturnDate.setDate(today.getDate() + 20);
+                maxReturnDate.setDate(today.getDate() + 14);
                 
                 setBorrowDate(today.toISOString().split('T')[0]);
                 setReturnDate(maxReturnDate.toISOString().split('T')[0]);

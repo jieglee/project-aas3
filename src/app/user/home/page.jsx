@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import WelcomeSection from "../../../component/user/Home/WelcomeSection";
 import StatsGrid from "../../../component/user/Home/StatsGrid";
-import BorrowedBooksSection from "../../../component/user/Home/BorrowedBooksSection";
 import NewBooksSection from "../../../component/user/Home/NewBooksSection";
 
 export default function HomePage() {
@@ -61,8 +60,6 @@ export default function HomePage() {
                 <WelcomeSection userName={user?.nama} />
                 
                 <StatsGrid />
-                
-                <BorrowedBooksSection />
                 
                 <NewBooksSection newBooks={newBooks} />
                 

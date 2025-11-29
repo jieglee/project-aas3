@@ -51,7 +51,7 @@ export default function ActionButtons({ book, id }) {
                     </svg>
                     <div className="text-sm text-blue-800">
                         <p className="font-medium mb-1">Informasi Peminjaman</p>
-                        <p>Masa peminjaman maksimal 7 hari. Keterlambatan pengembalian dikenakan denda.</p>
+                        <p>Masa peminjaman maksimal 14 hari. Keterlambatan pengembalian dikenakan denda.</p>
                     </div>
                 </div>
             </div>
