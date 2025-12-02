@@ -8,14 +8,35 @@ import BookCard from "../../../component/user/Whislist/BookCard";
 export default function WishlistPage() {
     const [wishlistBooks, setWishlistBooks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
+        // Ambil user dari localStorage
+        const profileData = localStorage.getItem("profileData");
+        if (profileData) {
+            const userData = JSON.parse(profileData);
+            setUser(userData);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!user?.id) return;
+
         async function fetchWishlist() {
             try {
                 setLoading(true);
-                const res = await fetch("/api/wishlist");
-                if (!res.ok) throw new Error("Failed to fetch wishlist");
+                console.log("Fetching wishlist for user:", user.id);
+                
+                // Kirim user_id sebagai query parameter
+                const res = await fetch(`/api/wishlist?userId=${user.id}`);
+                
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || "Failed to fetch wishlist");
+                }
+                
                 const data = await res.json();
+                console.log("Wishlist data received:", data);
                 setWishlistBooks(data);
             } catch (err) {
                 console.error("Error fetching wishlist:", err);
@@ -26,18 +47,25 @@ export default function WishlistPage() {
         }
 
         fetchWishlist();
-    }, []);
+    }, [user]);
 
     const handleRemoveFromWishlist = async (wishlist_id) => {
         try {
-            await fetch("/api/wishlist", {
+            console.log("Removing from wishlist:", wishlist_id);
+            
+            const res = await fetch("/api/wishlist", {
                 method: "DELETE",
                 body: JSON.stringify({ wishlist_id }),
                 headers: { "Content-Type": "application/json" },
             });
-            setWishlistBooks((prev) =>
-                prev.filter((book) => book.wishlist_id !== wishlist_id)
-            );
+
+            if (res.ok) {
+                // Update state untuk remove item dari UI
+                setWishlistBooks((prev) =>
+                    prev.filter((book) => book.wishlist_id !== wishlist_id)
+                );
+                console.log("✅ Successfully removed from wishlist");
+            }
         } catch (err) {
             console.error("Error removing from wishlist:", err);
         }
@@ -100,7 +128,6 @@ export default function WishlistPage() {
                 {wishlistBooks.length === 0 ? (
                     <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-300 p-16 text-center">
                         <div className="max-w-md mx-auto">
-                            {/* Icon */}
                             <div className="relative inline-block mb-6">
                                 <div className="bg-gray-100 rounded-full p-8">
                                     <Heart className="w-16 h-16 text-gray-400" />
@@ -110,7 +137,6 @@ export default function WishlistPage() {
                                 </div>
                             </div>
 
-                            {/* Text */}
                             <h3 className="text-2xl font-bold text-gray-900 mb-3">
                                 Wishlist Masih Kosong
                             </h3>
@@ -118,7 +144,6 @@ export default function WishlistPage() {
                                 Mulai tambahkan buku-buku favorit Anda ke wishlist untuk memudahkan tracking buku yang ingin dibaca
                             </p>
 
-                            {/* CTA Buttons */}
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link href="/user/katalog">
                                     <button className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
@@ -137,7 +162,6 @@ export default function WishlistPage() {
                     </div>
                 ) : (
                     <div>
-                        {/* Section Header with Filter/Sort (Optional) */}
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
@@ -149,7 +173,6 @@ export default function WishlistPage() {
                             </div>
                         </div>
 
-                        {/* Wishlist Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {wishlistBooks.map((book) => (
                                 <Link key={book.wishlist_id} href={`/user/detail/${book.buku_id}`}>

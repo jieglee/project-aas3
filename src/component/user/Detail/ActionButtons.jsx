@@ -1,27 +1,62 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaHeart } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 
 export default function ActionButtons({ book, id }) {
+    const [user, setUser] = useState(null);
+    const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
+
+    useEffect(() => {
+        // Ambil user dari localStorage
+        const profileData = localStorage.getItem("profileData");
+        if (profileData) {
+            const userData = JSON.parse(profileData);
+            setUser(userData);
+            console.log("User data loaded:", userData);
+        }
+    }, []);
 
     async function addWishlist() {
-        const res = await fetch("/api/wishlist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+        if (!user?.id) {
+            toast.error("Anda harus login terlebih dahulu!");
+            return;
+        }
+
+        if (isAddingToWishlist) return; // Prevent double click
+
+        try {
+            setIsAddingToWishlist(true);
+
+            console.log("Adding to wishlist:", {
                 buku_id: Number(id),
-                user_id: 1, // nanti ganti user login
-            }),
-        });
+                user_id: user.id
+            });
 
-        const data = await res.json();
+            const res = await fetch("/api/wishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    buku_id: Number(id),
+                    user_id: user.id, // ✅ Gunakan user.id dari localStorage
+                }),
+            });
 
-        if (data.success) {
-            toast.success(`${book.judul} berhasil ditambahkan ke wishlist!`);
-        } else {
-            toast.error("Gagal menambahkan wishlist.");
+            const data = await res.json();
+            console.log("Wishlist response:", data);
+
+            if (data.success) {
+                toast.success(data.message || `${book.judul} berhasil ditambahkan ke wishlist!`);
+            } else {
+                toast.error(data.message || "Gagal menambahkan wishlist.");
+            }
+        } catch (error) {
+            console.error("Error adding to wishlist:", error);
+            toast.error("Terjadi kesalahan saat menambahkan ke wishlist");
+        } finally {
+            setIsAddingToWishlist(false);
         }
     }
 
@@ -37,10 +72,13 @@ export default function ActionButtons({ book, id }) {
 
                 <button
                     onClick={addWishlist}
-                    className="flex-1 sm:flex-initial border-2 border-red-300 hover:border-red-500 hover:bg-red-50 px-6 py-3 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                    disabled={isAddingToWishlist || !user}
+                    className="flex-1 sm:flex-initial border-2 border-red-300 hover:border-red-500 hover:bg-red-50 px-6 py-3 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <FaHeart className="text-red-500" />
-                    <span className="text-red-600">Wishlist</span>
+                    <span className="text-red-600">
+                        {isAddingToWishlist ? "Menambahkan..." : "Wishlist"}
+                    </span>
                 </button>
             </div>
 

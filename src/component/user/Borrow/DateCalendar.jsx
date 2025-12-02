@@ -69,7 +69,7 @@ export default function DateCalendar({
                             // Auto set return date (14 hari dari tanggal pinjam)
                             const borrowDateObj = new Date(dateString + 'T00:00:00');
                             const returnDateObj = new Date(borrowDateObj);
-                            returnDateObj.setDate(returnDateObj.getDate() + 14);
+                            returnDateObj.setDate(returnDateObj.getDate() + 1);
                             
                             const returnDateString = getLocalDateString(
                                 returnDateObj.getFullYear(),

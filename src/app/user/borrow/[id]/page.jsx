@@ -34,7 +34,7 @@ export default function BookDetailPage() {
                 // Set default dates (maksimal 14 hari)
                 const today = new Date();
                 const maxReturnDate = new Date(today);
-                maxReturnDate.setDate(today.getDate() + 14);
+                maxReturnDate.setDate(today.getDate() + 1);
                 
                 setBorrowDate(today.toISOString().split('T')[0]);
                 setReturnDate(maxReturnDate.toISOString().split('T')[0]);
