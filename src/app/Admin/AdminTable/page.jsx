@@ -21,12 +21,55 @@ export default function LoanManagement() {
         fetchLoans();
     }, []);
 
+    // Fungsi untuk cek apakah peminjaman terlambat
+    const isLoanOverdue = (loan) => {
+        if (loan.status !== "Dipinjam") return false;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const returnDate = new Date(loan.tanggal_kembali);
+        returnDate.setHours(0, 0, 0, 0);
+        
+        return today > returnDate;
+    };
+
+    // Fungsi untuk hitung denda
+    const calculateDenda = (tanggal_kembali) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const returnDate = new Date(tanggal_kembali);
+        returnDate.setHours(0, 0, 0, 0);
+        
+        if (today <= returnDate) return 0;
+        
+        const diffTime = today - returnDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        return diffDays * 5000; 
+    };
+
     const fetchLoans = async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/peminjaman");
             const data = await res.json();
-            setLoans(Array.isArray(data) ? data : []);
+            
+            // Proses data untuk menambahkan informasi terlambat dan denda
+            const processedLoans = Array.isArray(data) ? data.map(loan => {
+                const overdue = isLoanOverdue(loan);
+                const denda = overdue ? calculateDenda(loan.tanggal_kembali) : 0;
+                
+                return {
+                    ...loan,
+                    isOverdue: overdue,
+                    denda: denda
+                };
+            }) : [];
+            
+            setLoans(processedLoans);
+            console.log("Loans processed:", processedLoans);
         } catch (err) {
             console.error("Error fetching loans:", err);
             setLoans([]);
@@ -117,14 +160,28 @@ export default function LoanManagement() {
         });
     };
 
+    // ✅ LOGIKA FILTER YANG DIUPDATE
     const filteredLoans = loans.filter(loan => {
-        const matchTab = activeTab === "Dikembalikan" 
-            ? (loan.status === "Dikembalikan" || loan.status === "Ditolak")
-            : loan.status === activeTab;
-            
+        let matchTab = false;
+        
+        if (activeTab === "Terlambat") {
+            // Tab Terlambat: hanya yang status Dipinjam DAN sudah lewat tanggal kembali
+            matchTab = loan.status === "Dipinjam" && loan.isOverdue;
+        } else if (activeTab === "Dipinjam") {
+            // Tab Dipinjam: hanya yang status Dipinjam DAN belum lewat tanggal kembali
+            matchTab = loan.status === "Dipinjam" && !loan.isOverdue;
+        } else if (activeTab === "Dikembalikan") {
+            // Tab Riwayat: Dikembalikan atau Ditolak
+            matchTab = loan.status === "Dikembalikan" || loan.status === "Ditolak";
+        } else {
+            // Tab lainnya (Menunggu, dll)
+            matchTab = loan.status === activeTab;
+        }
+        
         const matchSearch = 
             loan.peminjam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             loan.judulBuku?.toLowerCase().includes(searchTerm.toLowerCase());
+            
         return matchTab && matchSearch;
     });
 

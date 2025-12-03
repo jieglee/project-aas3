@@ -9,7 +9,13 @@ export default function LoanStats({ loans, activeTab, setActiveTab }) {
     ];
 
     const getTabCount = (status) => {
-        if (status === "Dikembalikan") {
+        if (status === "Terlambat") {
+            // Hitung yang status Dipinjam DAN sudah lewat tanggal kembali
+            return loans.filter(l => l.status === "Dipinjam" && l.isOverdue).length;
+        } else if (status === "Dipinjam") {
+            // Hitung yang status Dipinjam DAN belum lewat tanggal kembali
+            return loans.filter(l => l.status === "Dipinjam" && !l.isOverdue).length;
+        } else if (status === "Dikembalikan") {
             return loans.filter(l => l.status === "Dikembalikan" || l.status === "Ditolak").length;
         }
         return loans.filter(l => l.status === status).length;

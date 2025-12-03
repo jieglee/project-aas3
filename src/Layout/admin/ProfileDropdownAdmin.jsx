@@ -81,17 +81,30 @@ export default function ProfileDropdownAdmin() {
 
     const handleToggle = () => setOpen(!open);
 
-    const handleLogout = () => {
-        if (confirm("Apakah Anda yakin ingin keluar?")) {
+    const handleLogout = async () => {
+    if (confirm("Apakah Anda yakin ingin keluar?")) {
+        try {
+            // Panggil API logout untuk hapus cookie
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
             // Clear localStorage
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             localStorage.removeItem('userRole');
+            localStorage.removeItem('profileData');
             
             // Redirect ke login
             router.push('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Tetap redirect meskipun error
+            router.push('/login');
         }
-    };
+    }
+};
 
     // Tutup dropdown saat klik di luar
     useEffect(() => {
